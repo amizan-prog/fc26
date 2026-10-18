@@ -246,12 +246,12 @@
         </div>
     </main>
 
-    <!-- MODAL TETAPAN EMEL PIC -->
+    <!-- MODAL TETAPAN EMEL PIC & PILIHAN DATA -->
     <div id="emailConfigModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-2xl">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl max-h-[92vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                 <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                    <i class="fa-solid fa-envelope text-emerald-600"></i> Tetapan Emel PIC
+                    <i class="fa-solid fa-envelope text-emerald-600"></i> Tetapan Emel PIC & Laporan
                 </h3>
                 <button type="button" onclick="closeEmailConfigModal()" class="text-slate-400 hover:text-slate-600 text-lg px-1">
                     <i class="fa-solid fa-xmark"></i>
@@ -263,7 +263,6 @@
                     <label class="block text-xs font-bold text-slate-700 mb-1">Emel PIC (Person In Charge)</label>
                     <input type="email" id="inputPicEmail" placeholder="pic.logistik@nci.gov.my" 
                            class="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none font-medium">
-                    <p class="text-[10px] text-slate-500 mt-1">Alamat emel untuk penerimaan laporan inventori silinder gas.</p>
                 </div>
 
                 <div>
@@ -275,6 +274,33 @@
                     </select>
                 </div>
 
+                <!-- Checkbox Pilihan Data Emel -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+                    <span class="text-xs font-bold text-slate-700 block">Pilihan Data Emel Yang Dihantar:</span>
+                    <div class="space-y-1.5 text-xs text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="chkOptTotal" checked class="w-4 h-4 accent-emerald-600 rounded">
+                            <span>Jumlah Stok Semasa</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="chkOptOwned" checked class="w-4 h-4 accent-emerald-600 rounded">
+                            <span>Jumlah Silinder IKN</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="chkOptLoaned" checked class="w-4 h-4 accent-emerald-600 rounded">
+                            <span>Jumlah Silinder Pinjaman</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="chkOptTransactions" checked class="w-4 h-4 accent-emerald-600 rounded">
+                            <span>Senarai Transaksi Terima Dan Serah Ke Unit</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="chkOptExpiring" checked class="w-4 h-4 accent-emerald-600 rounded">
+                            <span>Silinder Hampir Luput (jika ada)</span>
+                        </label>
+                    </div>
+                </div>
+
                 <div class="bg-rose-50 p-3 rounded-xl border border-rose-200 flex items-center justify-between">
                     <div>
                         <span class="text-xs font-bold text-rose-900 block">Berhenti Emel (Stop Alerts)</span>
@@ -284,9 +310,15 @@
                 </div>
             </div>
 
-            <div class="flex gap-2 pt-2">
-                <button type="button" onclick="closeEmailConfigModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-xs font-semibold">Batal</button>
-                <button type="button" onclick="saveEmailConfig()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-xs font-bold shadow-sm">Simpan</button>
+            <!-- Butang Tindakan Emel -->
+            <div class="space-y-2 pt-1">
+                <button type="button" onclick="copyEmailLayout()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-xs font-bold shadow-sm transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-copy"></i> Salin Layout Emel (Cantik & Sedia Tampal)
+                </button>
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeEmailConfigModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-xs font-semibold">Batal</button>
+                    <button type="button" onclick="saveEmailConfig()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-xs font-bold shadow-sm">Simpan Tetapan</button>
+                </div>
             </div>
         </div>
     </div>
@@ -499,6 +531,7 @@
         let picEmail = localStorage.getItem('ikn_pic_email') || '';
         let picEmailFreq = localStorage.getItem('ikn_pic_email_freq') || 'Harian';
         let picEmailStopped = localStorage.getItem('ikn_pic_email_stopped') === 'true';
+        let picEmailOpts = JSON.parse(localStorage.getItem('ikn_pic_email_opts') || '{"total":true, "owned":true, "loaned":true, "transactions":true, "expiring":true}');
 
         let activeBarcode = '';
         let selectedAction = 'Terima';
@@ -521,7 +554,7 @@
         const isGoogleAppsScript = (typeof google !== 'undefined' && google.script && google.script.run);
         const isInIframe = (window.self !== window.top);
 
-        // --- PENGURUSAN EMEL PIC ---
+        // --- PENGURUSAN EMEL PIC & LAYOUT ---
         function updateEmailIconBadge() {
             const badge = document.getElementById('emailAlertBadge');
             if (picEmailStopped || !picEmail) {
@@ -535,6 +568,11 @@
             document.getElementById('inputPicEmail').value = picEmail;
             document.getElementById('selectEmailFrequency').value = picEmailFreq;
             document.getElementById('toggleStopEmail').checked = picEmailStopped;
+            document.getElementById('chkOptTotal').checked = picEmailOpts.total;
+            document.getElementById('chkOptOwned').checked = picEmailOpts.owned;
+            document.getElementById('chkOptLoaned').checked = picEmailOpts.loaned;
+            document.getElementById('chkOptTransactions').checked = picEmailOpts.transactions;
+            document.getElementById('chkOptExpiring').checked = picEmailOpts.expiring;
             document.getElementById('emailConfigModal').classList.remove('hidden');
         }
 
@@ -546,10 +584,18 @@
             picEmail = document.getElementById('inputPicEmail').value.trim();
             picEmailFreq = document.getElementById('selectEmailFrequency').value;
             picEmailStopped = document.getElementById('toggleStopEmail').checked;
+            picEmailOpts = {
+                total: document.getElementById('chkOptTotal').checked,
+                owned: document.getElementById('chkOptOwned').checked,
+                loaned: document.getElementById('chkOptLoaned').checked,
+                transactions: document.getElementById('chkOptTransactions').checked,
+                expiring: document.getElementById('chkOptExpiring').checked
+            };
 
             localStorage.setItem('ikn_pic_email', picEmail);
             localStorage.setItem('ikn_pic_email_freq', picEmailFreq);
             localStorage.setItem('ikn_pic_email_stopped', String(picEmailStopped));
+            localStorage.setItem('ikn_pic_email_opts', JSON.stringify(picEmailOpts));
 
             updateEmailIconBadge();
             closeEmailConfigModal();
@@ -558,13 +604,132 @@
                 fetch(customWebAppUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'saveEmailConfig', email: picEmail, frequency: picEmailFreq, stopped: picEmailStopped })
+                    body: JSON.stringify({ action: 'saveEmailConfig', email: picEmail, frequency: picEmailFreq, stopped: picEmailStopped, dataOptions: picEmailOpts })
                 }).catch(() => {});
             } else if (isGoogleAppsScript) {
-                google.script.run.saveCylinderTransaction({ action: 'saveEmailConfig', email: picEmail, frequency: picEmailFreq, stopped: picEmailStopped });
+                google.script.run.saveCylinderTransaction({ action: 'saveEmailConfig', email: picEmail, frequency: picEmailFreq, stopped: picEmailStopped, dataOptions: picEmailOpts });
             }
 
-            alert("Tetapan Emel PIC berjaya disimpan!");
+            alert("Tetapan Emel PIC & pilihan data berjaya disimpan!");
+        }
+
+        function copyEmailLayout() {
+            const total = cylindersDb.length;
+            let owned = 0, loaned = 0;
+            let expiringList = [];
+
+            cylindersDb.forEach(c => {
+                const ownStr = String(c.ownership || '').toUpperCase();
+                if (ownStr.includes('IKN') || ownStr.includes('OWNED') || ownStr.includes('MILIK')) owned++;
+                else loaned++;
+
+                if (isExpiringWithin30Days(c.expiry)) expiringList.push(c);
+            });
+
+            const todayStr = new Date().toLocaleDateString('ms-MY', { year: 'numeric', month: 'long', day: 'numeric' });
+            
+            let htmlContent = `
+            <div style="font-family: Arial, sans-serif; color: #334155; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
+                <div style="text-align: center; border-bottom: 2px solid #047857; padding-bottom: 12px; margin-bottom: 16px;">
+                    <h2 style="color: #047857; margin: 0; font-size: 18px;">LAPORAN INVENTORI SILINDER GAS IKN</h2>
+                    <p style="margin: 4px 0 0; font-size: 12px; color: #64748b;">Logistik Farmasi Institut Kanser Negara | Tarikh: ${todayStr}</p>
+                </div>
+            `;
+
+            if (picEmailOpts.total || picEmailOpts.owned || picEmailOpts.loaned) {
+                htmlContent += `
+                <div style="margin-bottom: 16px;">
+                    <h3 style="font-size: 14px; color: #1e293b; border-left: 4px solid #047857; padding-left: 8px; margin-bottom: 8px;">Ringkasan Stok</h3>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                `;
+                if (picEmailOpts.total) htmlContent += `<tr><td style="padding: 6px; border-bottom: 1px solid #f1f5f9;">Jumlah Stok Semasa Silinder</td><td style="padding: 6px; border-bottom: 1px solid #f1f5f9; text-align: right; font-weight: bold;">${total} Unit</td></tr>`;
+                if (picEmailOpts.owned) htmlContent += `<tr><td style="padding: 6px; border-bottom: 1px solid #f1f5f9;">Jumlah Silinder Milik IKN</td><td style="padding: 6px; border-bottom: 1px solid #f1f5f9; text-align: right; font-weight: bold; color: #047857;">${owned} Unit</td></tr>`;
+                if (picEmailOpts.loaned) htmlContent += `<tr><td style="padding: 6px; border-bottom: 1px solid #f1f5f9;">Jumlah Silinder Pinjaman</td><td style="padding: 6px; border-bottom: 1px solid #f1f5f9; text-align: right; font-weight: bold; color: #d97706;">${loaned} Unit</td></tr>`;
+                htmlContent += `</table></div>`;
+            }
+
+            if (picEmailOpts.transactions) {
+                const recentTx = cylindersDb.slice(0, 5);
+                htmlContent += `
+                <div style="margin-bottom: 16px;">
+                    <h3 style="font-size: 14px; color: #1e293b; border-left: 4px solid #047857; padding-left: 8px; margin-bottom: 8px;">Transaksi Terkini (Terima & Serah Unit)</h3>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        <tr style="background-color: #f8fafc; text-align: left;">
+                            <th style="padding: 6px; border-bottom: 1px solid #cbd5e1;">ID / Kod</th>
+                            <th style="padding: 6px; border-bottom: 1px solid #cbd5e1;">Gas</th>
+                            <th style="padding: 6px; border-bottom: 1px solid #cbd5e1;">Status / Unit</th>
+                        </tr>
+                `;
+                if (recentTx.length === 0) {
+                    htmlContent += `<tr><td colspan="3" style="padding: 8px; text-align: center; color: #94a3b8;">Tiada rekod transaksi.</td></tr>`;
+                } else {
+                    recentTx.forEach(tx => {
+                        htmlContent += `<tr><td style="padding: 6px; border-bottom: 1px solid #f1f5f9; font-family: monospace;">${tx.barcode}</td><td style="padding: 6px; border-bottom: 1px solid #f1f5f9;">${tx.name}</td><td style="padding: 6px; border-bottom: 1px solid #f1f5f9;">${tx.subCategory || '-'}</td></tr>`;
+                    });
+                }
+                htmlContent += `</table></div>`;
+            }
+
+            if (picEmailOpts.expiring) {
+                htmlContent += `
+                <div style="margin-bottom: 16px;">
+                    <h3 style="font-size: 14px; color: #991b1b; border-left: 4px solid #dc2626; padding-left: 8px; margin-bottom: 8px;">Silinder Hampir Luput (&lt; 30 Hari)</h3>
+                `;
+                if (expiringList.length === 0) {
+                    htmlContent += `<p style="font-size: 12px; color: #16a34a; margin: 0;">Tiada silinder yang hampir tamat tempoh.</p>`;
+                } else {
+                    htmlContent += `
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        <tr style="background-color: #fef2f2; text-align: left;">
+                            <th style="padding: 6px; border-bottom: 1px solid #fca5a5;">ID / Kod</th>
+                            <th style="padding: 6px; border-bottom: 1px solid #fca5a5;">Gas</th>
+                            <th style="padding: 6px; border-bottom: 1px solid #fca5a5;">Tarikh Luput</th>
+                        </tr>
+                    `;
+                    expiringList.forEach(ex => {
+                        htmlContent += `<tr><td style="padding: 6px; border-bottom: 1px solid #fee2e2; font-family: monospace;">${ex.barcode}</td><td style="padding: 6px; border-bottom: 1px solid #fee2e2;">${ex.name}</td><td style="padding: 6px; border-bottom: 1px solid #fee2e2; color: #dc2626; font-weight: bold;">${ex.expiry}</td></tr>`;
+                    });
+                    htmlContent += `</table>`;
+                }
+                htmlContent += `</div>`;
+            }
+
+            htmlContent += `
+                <div style="text-align: center; font-size: 10px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 10px; margin-top: 16px;">
+                    Emel dijana secara automatik oleh Sistem Inventori Silinder Gas IKN.
+                </div>
+            </div>
+            `;
+
+            // Salin ke papan klip menggunakan Clipboard API (HTML & Plain Text)
+            if (navigator.clipboard && window.ClipboardItem) {
+                const blobHtml = new Blob([htmlContent], { type: 'text/html' });
+                const blobText = new Blob([htmlContent.replace(/<[^>]*>/g, '')], { type: 'text/plain' });
+                navigator.clipboard.write([
+                    new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })
+                ]).then(() => {
+                    alert("Layout emel berjaya disalin! Anda boleh terus tampal (Paste) ke dalam emel anda.");
+                }).catch(() => {
+                    fallbackCopyText(htmlContent);
+                });
+            } else {
+                fallbackCopyText(htmlContent);
+            }
+        }
+
+        function fallbackCopyText(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                alert("Layout emel berjaya disalin!");
+            } catch (err) {
+                alert("Gagal menyalin layout emel.");
+            }
+            document.body.removeChild(textArea);
         }
 
         // --- URL GOOGLE SHEETS ---
