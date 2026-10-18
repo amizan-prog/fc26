@@ -13,7 +13,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
 
-    <!-- Header -->
+    <!-- Header / Bar Tajuk -->
     <header class="bg-emerald-700 text-white shadow-md sticky top-0 z-30">
         <div class="max-w-xl mx-auto px-4 py-3 flex justify-between items-center">
             <div>
@@ -22,12 +22,17 @@
                 </h1>
                 <p class="text-[11px] text-emerald-100">Sistem Inventori Silinder Gas Bersepadu</p>
             </div>
-            <div class="flex items-center gap-1.5">
-                <button type="button" onclick="openUrlConfigModal()" class="bg-emerald-800 hover:bg-emerald-900 text-xs px-2.5 py-1.5 rounded-lg border border-emerald-600 flex items-center gap-1 transition" title="Papar / Edit URL Google Sheets">
+            <!-- Ikon Emel & Butang Tetapan di Bar Tajuk -->
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="openEmailConfigModal()" class="bg-emerald-800 hover:bg-emerald-900 text-emerald-100 hover:text-white p-2 rounded-lg border border-emerald-600 transition relative" title="Tetapan Emel PIC">
+                    <i class="fa-solid fa-envelope text-sm"></i>
+                    <span id="emailAlertBadge" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                </button>
+                <button type="button" onclick="openUrlConfigModal()" class="bg-emerald-800 hover:bg-emerald-900 text-xs px-2.5 py-1.5 rounded-lg border border-emerald-600 flex items-center gap-1 transition" title="Edit URL Google Sheets">
                     <i class="fa-solid fa-link"></i> <span class="hidden sm:inline">URL Sheets</span>
                 </button>
                 <button type="button" onclick="syncNow(true)" class="bg-emerald-800 hover:bg-emerald-900 text-xs px-2.5 py-1.5 rounded-lg border border-emerald-600 flex items-center gap-1 transition">
-                    <i class="fa-solid fa-arrows-rotate" id="syncIcon"></i> <span id="syncBtnText">Sync</span>
+                    <i class="fa-solid fa-arrows-rotate" id="syncIcon"></i>
                 </button>
             </div>
         </div>
@@ -36,45 +41,19 @@
     <!-- Kandungan Utama -->
     <main class="flex-1 max-w-xl w-full mx-auto p-4 space-y-4 pb-20">
 
-        <!-- BAR STATUS AUTO-SYNC & PAPARAN URL GOOGLE SHEETS -->
-        <div id="statusBanner" class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm space-y-2.5">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <span id="syncDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-xs font-bold text-slate-700" id="statusText">Auto-Sync Google Sheets Aktif</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                    <span id="pendingQueueBadge" onclick="processOfflineQueue()" class="hidden cursor-pointer bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded-full font-bold text-[10px]">
-                        0 Pending
-                    </span>
-                    <span id="recordBadge" class="bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full font-bold text-[10px]">
-                        Diselaraskan
-                    </span>
-                </div>
+        <!-- Status Bar Kecil (Diselaraskan & Pending) -->
+        <div class="bg-white border border-slate-200 rounded-xl px-3.5 py-2 flex justify-between items-center text-xs shadow-2xs">
+            <div class="flex items-center gap-2">
+                <span id="syncDot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span id="lastSyncTimeLabel" class="text-slate-600 font-medium">Auto-Sync Aktif</span>
             </div>
-
-            <!-- Kotak Paparan URL Semasa & Butang Edit Pantas -->
-            <div class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 flex items-center justify-between gap-2">
-                <div class="min-w-0 flex-1">
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">URL Sambungan:</span>
-                        <span id="lastSyncTimeLabel" class="text-[10px] text-emerald-600 font-medium">Belum disegerakkan</span>
-                    </div>
-                    <p id="currentUrlDisplay" class="text-[11px] font-mono text-slate-600 truncate mt-0.5">
-                        Mengesan sambungan Google Sheets...
-                    </p>
-                </div>
-                <div class="flex items-center gap-1 shrink-0">
-                    <a id="btnOpenSheetLink" href="#" target="_blank" rel="noopener noreferrer" class="hidden bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 p-1.5 rounded-lg text-xs transition" title="Buka Fail Google Sheets">
-                        <i class="fa-solid fa-table"></i>
-                    </a>
-                    <button type="button" onclick="copyCurrentUrl()" class="bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 p-1.5 rounded-lg text-xs transition" title="Salin URL">
-                        <i class="fa-regular fa-copy"></i>
-                    </button>
-                    <button type="button" onclick="openUrlConfigModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1">
-                        <i class="fa-solid fa-pen-to-square"></i> Edit URL
-                    </button>
-                </div>
+            <div class="flex items-center gap-1.5">
+                <span id="pendingQueueBadge" onclick="processOfflineQueue()" class="hidden cursor-pointer bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded-full font-bold text-[10px]">
+                    0 Pending
+                </span>
+                <span id="recordBadge" class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold text-[10px]">
+                    Diselaraskan
+                </span>
             </div>
         </div>
 
@@ -90,10 +69,9 @@
             </div>
 
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                <!-- 1. Jumlah Semasa Silinder -->
                 <div onclick="setDashboardFilter('ALL')" id="cardStatAll" class="cursor-pointer p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-100 transition flex flex-col justify-between">
                     <div class="flex justify-between items-start">
-                        <span class="text-[11px] font-semibold text-slate-500 leading-tight">Jumlah Semasa Silinder</span>
+                        <span class="text-[11px] font-semibold text-slate-500 leading-tight">Jumlah Semasa</span>
                         <span class="w-6 h-6 rounded-lg bg-slate-200/80 text-slate-700 flex items-center justify-center text-xs shrink-0">
                             <i class="fa-solid fa-layer-group"></i>
                         </span>
@@ -104,7 +82,6 @@
                     </div>
                 </div>
 
-                <!-- 2. Milik IKN Semasa -->
                 <div onclick="setDashboardFilter('OWNED')" id="cardStatOwned" class="cursor-pointer p-3 rounded-xl border border-emerald-200 bg-emerald-50/60 hover:bg-emerald-100/70 transition flex flex-col justify-between">
                     <div class="flex justify-between items-start">
                         <span class="text-[11px] font-semibold text-emerald-800 leading-tight">Milik IKN Semasa</span>
@@ -118,7 +95,6 @@
                     </div>
                 </div>
 
-                <!-- 3. Pinjaman Semasa -->
                 <div onclick="setDashboardFilter('LOANED')" id="cardStatLoaned" class="cursor-pointer p-3 rounded-xl border border-amber-200 bg-amber-50/60 hover:bg-amber-100/70 transition flex flex-col justify-between">
                     <div class="flex justify-between items-start">
                         <span class="text-[11px] font-semibold text-amber-900 leading-tight">Pinjaman Semasa</span>
@@ -132,10 +108,9 @@
                     </div>
                 </div>
 
-                <!-- 4. Hampir Tamat Tempoh (< 30 Hari) -->
                 <div onclick="setDashboardFilter('EXPIRING')" id="cardStatExpiring" class="cursor-pointer p-3 rounded-xl border border-rose-200 bg-rose-50/60 hover:bg-rose-100/70 transition flex flex-col justify-between">
                     <div class="flex justify-between items-start">
-                        <span class="text-[11px] font-semibold text-rose-900 leading-tight">Hampir Tamat Tempoh</span>
+                        <span class="text-[11px] font-semibold text-rose-900 leading-tight">Hampir Luput</span>
                         <span class="w-6 h-6 rounded-lg bg-rose-200/80 text-rose-800 flex items-center justify-center text-xs shrink-0">
                             <i class="fa-solid fa-clock"></i>
                         </span>
@@ -170,7 +145,7 @@
                 </button>
             </div>
 
-            <!-- 1. Mod Papan Kekunci / Pengimbas Bluetooth / Papan Kekunci NFC -->
+            <!-- 1. Mod Papan Kekunci -->
             <div id="panelKeyboard" class="space-y-2.5 pt-1">
                 <div class="flex gap-2">
                     <input type="text" id="manualCodeInput" 
@@ -182,7 +157,6 @@
                         SAHKAN
                     </button>
                 </div>
-                <!-- Butang Ujian Pantas -->
                 <div class="flex items-center gap-1.5 flex-wrap">
                     <span class="text-[11px] text-slate-400">Simulasi Pantas:</span>
                     <button type="button" onclick="handleScanTrigger('EFTM03014')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] px-2.5 py-1 rounded-lg border border-slate-200 font-mono">EFTM03014</button>
@@ -191,7 +165,7 @@
                 </div>
             </div>
 
-            <!-- 2. Mod Kamera QR / Barcode -->
+            <!-- 2. Mod Kamera -->
             <div id="panelCamera" class="hidden space-y-2 pt-1">
                 <div id="qrReader" class="w-full rounded-xl overflow-hidden border border-slate-300 bg-slate-900 min-h-[220px]"></div>
                 <p id="cameraErrorMsg" class="hidden text-xs text-rose-600 text-center font-medium bg-rose-50 p-2 rounded-lg border border-rose-200"></p>
@@ -201,7 +175,7 @@
                 </div>
             </div>
 
-            <!-- 3. Mod Tag NFC -->
+            <!-- 3. Mod NFC -->
             <div id="panelNfc" class="hidden space-y-3 pt-1">
                 <div id="nfcMainBox" class="p-4 rounded-xl border border-slate-200 bg-slate-50 text-center space-y-2.5">
                     <div id="nfcIconWrap" class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto text-xl">
@@ -209,22 +183,18 @@
                     </div>
                     <h3 id="nfcTitle" class="text-xs font-bold text-slate-800">Pengimbas Tag NFC Silinder</h3>
                     <p id="nfcDesc" class="text-[11px] text-slate-600 leading-relaxed">
-                        Tekan butang di bawah dan rapatkan bahagian belakang telefon Android anda pada tag NFC silinder.
+                        Tekan butang di bawah dan rapatkan belakang telefon Android anda pada tag NFC silinder.
                     </p>
                     <button type="button" onclick="activateNfcReader()" id="btnStartNfc" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-5 py-2.5 rounded-xl font-bold shadow-sm transition">
                         Aktifkan Imbasan NFC
                     </button>
                 </div>
 
-                <!-- Panduan & Input Pantas jika disekat oleh Iframe Google Apps Script -->
                 <div id="nfcIframeWarning" class="hidden bg-amber-50 border border-amber-300 rounded-xl p-3.5 space-y-2.5 text-xs text-amber-900">
                     <div class="font-bold flex items-center gap-1.5 text-amber-800">
                         <i class="fa-solid fa-circle-info text-sm"></i>
                         Mod Input Pantas NFC (Sokongan Iframe)
                     </div>
-                    <p class="text-[11px] leading-relaxed">
-                        Pelayar Chrome menyekat akses terus <code>Web NFC</code> kerana halaman dibuka di dalam <b>iframe</b>.
-                    </p>
                     <div class="bg-white p-2.5 rounded-lg border border-amber-200 space-y-2">
                         <p class="text-[11px] font-semibold text-slate-700">Imbas Menggunakan Papan Kekunci NFC / Tampal ID:</p>
                         <div class="flex gap-1.5 pt-1">
@@ -242,7 +212,7 @@
             </div>
         </div>
 
-        <!-- Senarai Pangkalan Data Silinder (1 Silinder = 1 Rekod Unik) -->
+        <!-- Senarai Pangkalan Data Silinder -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3">
             <div class="flex justify-between items-center gap-2">
                 <div>
@@ -276,12 +246,56 @@
         </div>
     </main>
 
-    <!-- MODAL PAPAR / EDIT URL GOOGLE SHEETS & TETAPAN AUTO-SYNC -->
+    <!-- MODAL TETAPAN EMEL PIC -->
+    <div id="emailConfigModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-envelope text-emerald-600"></i> Tetapan Emel PIC
+                </h3>
+                <button type="button" onclick="closeEmailConfigModal()" class="text-slate-400 hover:text-slate-600 text-lg px-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">URL Endpoint Emel / Webhook</label>
+                    <input type="url" id="inputEmailUrl" placeholder="https://script.google.com/macros/s/.../exec" 
+                           class="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Kekerapan Laporan Emel</label>
+                    <select id="selectEmailFrequency" class="w-full text-xs p-2.5 border border-slate-300 rounded-xl bg-white font-semibold">
+                        <option value="Harian">Harian (Daily)</option>
+                        <option value="Mingguan">Mingguan (Weekly)</option>
+                        <option value="Bulanan">Bulanan (Monthly)</option>
+                    </select>
+                </div>
+
+                <div class="bg-rose-50 p-3 rounded-xl border border-rose-200 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-rose-900 block">Berhenti Emel (Stop Alerts)</span>
+                        <span class="text-[10px] text-rose-700">Tutup penghantaran laporan automatik</span>
+                    </div>
+                    <input type="checkbox" id="toggleStopEmail" class="w-4 h-4 accent-rose-600 rounded cursor-pointer">
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button type="button" onclick="closeEmailConfigModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-xs font-semibold">Batal</button>
+                <button type="button" onclick="saveEmailConfig()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-xs font-bold shadow-sm">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TETAPAN URL GOOGLE SHEETS -->
     <div id="urlConfigModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                 <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                    <i class="fa-solid fa-cloud-arrow-up text-emerald-600"></i> Tetapan URL & Auto-Sync Sheets
+                    <i class="fa-solid fa-link text-emerald-600"></i> Tetapan URL Google Sheets
                 </h3>
                 <button type="button" onclick="closeUrlConfigModal()" class="text-slate-400 hover:text-slate-600 text-lg px-1">
                     <i class="fa-solid fa-xmark"></i>
@@ -289,55 +303,28 @@
             </div>
 
             <div class="space-y-3">
-                <!-- Input 1: Google Apps Script Web App URL (Untuk API Auto-Sync) -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">
-                        1. URL Web App Google Apps Script (Endpoint Auto-Sync)
-                    </label>
-                    <input type="url" id="inputWebAppUrl" 
-                           placeholder="https://script.google.com/macros/s/.../exec" 
-                           class="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono text-slate-700">
-                    <p class="text-[10px] text-slate-500 mt-1">
-                        Digunakan untuk menghantar & menyegerakkan data secara automatik ke Google Sheets.
-                    </p>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">URL Web App Google Apps Script</label>
+                    <input type="url" id="inputWebAppUrl" placeholder="https://script.google.com/macros/s/.../exec" 
+                           class="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
                 </div>
-
-                <!-- Input 2: Pautan Fail Google Sheets (Untuk rujukan / buka terus) -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">
-                        2. URL Fail Google Sheets Team (Pilihan - Untuk Buka Terus)
-                    </label>
-                    <input type="url" id="inputSheetViewUrl" 
-                           placeholder="https://docs.google.com/spreadsheets/d/.../edit" 
-                           class="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono text-slate-700">
-                </div>
-
-                <!-- Pilihan Auto-Sync Berkala -->
-                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center justify-between">
-                    <div>
-                        <span class="text-xs font-bold text-slate-700 block">Auto-Sync Latar Belakang (Setiap 30s)</span>
-                        <span class="text-[10px] text-slate-500">Kemas kini senarai silinder team secara automatik</span>
-                    </div>
-                    <input type="checkbox" id="toggleAutoSync" checked class="w-4 h-4 accent-emerald-600 rounded cursor-pointer">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">URL Fail Google Sheets (Pilihan)</label>
+                    <input type="url" id="inputSheetViewUrl" placeholder="https://docs.google.com/spreadsheets/d/.../edit" 
+                           class="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
                 </div>
             </div>
 
             <div class="flex gap-2 pt-2">
-                <button type="button" onclick="resetDefaultUrls()" class="px-3 py-2.5 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-100 text-xs font-semibold transition">
-                    Reset Lalai
-                </button>
-                <button type="button" onclick="saveUrlConfig()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-xs font-bold shadow-sm transition flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-floppy-disk"></i> Simpan & Uji Sync
-                </button>
+                <button type="button" onclick="closeUrlConfigModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-xs font-semibold">Batal</button>
+                <button type="button" onclick="saveUrlConfig()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-xs font-bold shadow-sm">Simpan</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL PENGESAHAN IMBASAN: EDIT BUTIRAN & MENU TERIMA / SERAH -->
+    <!-- MODAL TRANSAKSI SILINDER -->
     <div id="scanModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl max-h-[92vh] overflow-y-auto">
-            
-            <!-- Kepala Modal -->
             <div class="flex justify-between items-start border-b border-slate-100 pb-3">
                 <div>
                     <div class="flex items-center gap-2">
@@ -351,18 +338,16 @@
                 </button>
             </div>
 
-            <!-- Notis Kemaskini jika Silinder Sama Diimbas -->
             <div id="duplicatePromptBanner" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-3 flex items-center justify-between">
                 <div class="text-[11px] text-blue-800">
                     <i class="fa-solid fa-pen-to-square mr-1"></i>
-                    <b>Silinder Sedia Ada!</b> Hanya 1 rekod unik disimpan dalam pangkalan data.
+                    <b>Silinder Sedia Ada!</b> Hanya 1 rekod unik disimpan.
                 </div>
                 <button type="button" onclick="toggleFormLock(false)" id="btnUnlockEdit" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shrink-0 ml-2">
                     Edit Butiran
                 </button>
             </div>
 
-            <!-- Borang Butiran Silinder -->
             <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-3">
                 <div class="grid grid-cols-2 gap-2.5">
                     <div>
@@ -381,7 +366,6 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-2.5">
-                    <!-- Dropdown / Auto-Complete Kapasiti (kg) -->
                     <div id="capacityWrap" class="relative">
                         <label class="block text-[11px] font-semibold text-slate-600 mb-1">Kapasiti (kg)</label>
                         <div class="relative">
@@ -396,7 +380,6 @@
                                 <i class="fa-solid fa-chevron-down"></i>
                             </button>
                         </div>
-                        <!-- Senarai Dropdown Auto-Complete Kapasiti (kg) -->
                         <div id="capacityAutocompleteList" class="hidden absolute left-0 right-0 mt-1 bg-white border border-slate-300 rounded-xl shadow-lg max-h-44 overflow-y-auto z-50 divide-y divide-slate-100">
                         </div>
                     </div>
@@ -416,7 +399,6 @@
                 </div>
             </div>
 
-            <!-- MENU UTAMA SELEPAS IMBASAN: 1) TERIMA, 2) SERAH -->
             <div class="space-y-3 pt-1">
                 <label class="block text-xs font-bold text-slate-700">Pilih Menu Pergerakan:</label>
                 <div class="grid grid-cols-2 gap-2.5">
@@ -430,7 +412,6 @@
                     </button>
                 </div>
 
-                <!-- Sub-Menu di bawah 1) TERIMA: 1) Dari Pembekal, 2) Unit -->
                 <div id="subMenuTerimaBox" class="space-y-2 bg-emerald-50/50 p-3 rounded-xl border border-emerald-100">
                     <span class="text-[11px] font-bold text-emerald-800 block">Sub-Menu Terima:</span>
                     <div class="grid grid-cols-2 gap-2">
@@ -445,7 +426,6 @@
                     </div>
                 </div>
 
-                <!-- Sub-Menu di bawah 2) SERAH: Unit -->
                 <div id="subMenuSerahBox" class="hidden space-y-2 bg-indigo-50/50 p-3 rounded-xl border border-indigo-100">
                     <span class="text-[11px] font-bold text-indigo-800 block">Sub-Menu Serah:</span>
                     <button type="button" onclick="selectSubMenu('Unit')" id="btnSubSerahUnit" 
@@ -454,7 +434,6 @@
                     </button>
                 </div>
 
-                <!-- Input Auto-Complete Unit IKN / Catatan Pembekal -->
                 <div id="unitDetailWrap" class="space-y-2 relative">
                     <div class="flex justify-between items-center">
                         <label id="unitDetailLabel" class="block text-[11px] font-semibold text-slate-700">Pilih atau Taip Nama Unit IKN:</label>
@@ -469,19 +448,16 @@
                                onfocus="onUnitInputFocus()"
                                oninput="onUnitInputType(this.value)"
                                onkeydown="handleUnitKeyDown(event)"
-                               placeholder="Taip untuk auto-complete unit (Cth: ICU, W5A, PETCT(F)...)" 
+                               placeholder="Cari Unit (Cth: ICU, W5A, GOT...)" 
                                class="w-full text-xs p-2.5 pr-8 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold text-slate-800 bg-white uppercase">
                         <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-slate-400 text-xs pointer-events-none" id="unitDropdownArrow"></i>
-
-                        <!-- Senarai Dropdown Auto-Complete Interaktif -->
                         <div id="unitAutocompleteList" class="hidden absolute left-0 right-0 mt-1 bg-white border border-slate-300 rounded-xl shadow-lg max-h-48 overflow-y-auto z-50 divide-y divide-slate-100">
                         </div>
                     </div>
 
-                    <!-- Paparan Butang Cip Pantas semua 39 Unit IKN -->
                     <div id="unitQuickChipsBox" class="hidden space-y-1.5 pt-1">
                         <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-slate-500 font-medium">Senarai Pantas 39 Unit IKN (Klik untuk pilih):</span>
+                            <span class="text-[10px] text-slate-500 font-medium">Senarai Pantas 39 Unit IKN:</span>
                             <span id="unitMatchCount" class="text-[10px] font-bold text-emerald-700">39 Unit</span>
                         </div>
                         <div id="unitQuickChips" class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-2 bg-slate-100/80 rounded-xl border border-slate-200">
@@ -490,16 +466,14 @@
                 </div>
             </div>
 
-            <!-- Butang Simpan -->
             <button type="button" onclick="submitTransaction()" id="btnSubmitSave" 
                     class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl text-sm font-bold shadow-md transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-cloud-arrow-up"></i> Simpan & Auto-Sync ke Google Sheets
+                <i class="fa-solid fa-cloud-arrow-up"></i> Simpan Transaksi & Auto-Sync
             </button>
         </div>
     </div>
 
     <script>
-        // Senarai Rasmi 39 Unit di Institut Kanser Negara (IKN)
         const IKN_UNITS = [
             "ICU", "W5A", "W6A", "W6B", "W7A", "W7B", "ADM", "BOT", "CSSD", "DCO", 
             "HNU", "IFS", "GOT", "PAT", "PHY", "TCM", "IPC", "UKA", "RKD", "PPD", 
@@ -507,10 +481,8 @@
             "ONC", "PETCT(F)", "RADIO", "RTC", "RTT", "WRR", "OPC", "CDR/TPN", "PETCT(N)"
         ];
 
-        // Senarai Pilihan Kapasiti (kg)
         const CAPACITY_OPTIONS = ["0.5", "0.7", "1.4", "2.4", "3", "6", "7", "30"];
 
-        // Storan Tempatan: Pangkalan Data, URL, & Baris Gilir Luar Talian (Offline Queue)
         let cylindersDb = [];
         let offlineQueue = [];
         try {
@@ -523,8 +495,9 @@
 
         let customWebAppUrl = localStorage.getItem('ikn_webapp_url') || '';
         let customSheetViewUrl = localStorage.getItem('ikn_sheet_view_url') || '';
-        let autoSyncEnabled = localStorage.getItem('ikn_autosync_enabled') !== 'false';
-        let autoSyncIntervalId = null;
+        let picEmailUrl = localStorage.getItem('ikn_pic_email_url') || '';
+        let picEmailFreq = localStorage.getItem('ikn_pic_email_freq') || 'Harian';
+        let picEmailStopped = localStorage.getItem('ikn_pic_email_stopped') === 'true';
 
         let activeBarcode = '';
         let selectedAction = 'Terima';
@@ -536,7 +509,6 @@
         let activeCapacityIndex = -1;
         let currentFilteredCapacities = [...CAPACITY_OPTIONS];
 
-        // Kawalan Anti-Double Scan (3 saat)
         let lastScannedCode = '';
         let lastScannedTimestamp = 0;
         const DOUBLE_SCAN_COOLDOWN_MS = 3000;
@@ -545,54 +517,70 @@
         let isCameraTransitioning = false;
         let sharedAudioCtx = null;
 
-        // Semak persekitaran Google Apps Script & Iframe
         const isGoogleAppsScript = (typeof google !== 'undefined' && google.script && google.script.run);
         const isInIframe = (window.self !== window.top);
 
-        // --- PENGURUSAN URL & AUTO-SYNC GOOGLE SHEETS ---
-        function updateUrlBannerUI() {
-            const urlDisplay = document.getElementById('currentUrlDisplay');
-            const openSheetBtn = document.getElementById('btnOpenSheetLink');
-            const pendingBadge = document.getElementById('pendingQueueBadge');
-            const syncDot = document.getElementById('syncDot');
-            const statusText = document.getElementById('statusText');
+        // --- PENGURUSAN TETAPAN EMEL PIC ---
+        function updateEmailIconBadge() {
+            const badge = document.getElementById('emailAlertBadge');
+            if (picEmailStopped || !picEmailUrl) {
+                badge.classList.add('hidden');
+            } else {
+                badge.classList.remove('hidden');
+            }
+        }
 
-            // Paparkan bilangan rekod dalam baris gilir luar talian jika ada
+        function openEmailConfigModal() {
+            document.getElementById('inputEmailUrl').value = picEmailUrl;
+            document.getElementById('selectEmailFrequency').value = picEmailFreq;
+            document.getElementById('toggleStopEmail').checked = picEmailStopped;
+            document.getElementById('emailConfigModal').classList.remove('hidden');
+        }
+
+        function closeEmailConfigModal() {
+            document.getElementById('emailConfigModal').classList.add('hidden');
+        }
+
+        function saveEmailConfig() {
+            picEmailUrl = document.getElementById('inputEmailUrl').value.trim();
+            picEmailFreq = document.getElementById('selectEmailFrequency').value;
+            picEmailStopped = document.getElementById('toggleStopEmail').checked;
+
+            localStorage.setItem('ikn_pic_email_url', picEmailUrl);
+            localStorage.setItem('ikn_pic_email_freq', picEmailFreq);
+            localStorage.setItem('ikn_pic_email_stopped', String(picEmailStopped));
+
+            updateEmailIconBadge();
+            closeEmailConfigModal();
+
+            // Hantar tetapan emel ke Cloud/Sheets jika ada URL
+            if (customWebAppUrl) {
+                fetch(customWebAppUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'saveEmailConfig', emailUrl: picEmailUrl, frequency: picEmailFreq, stopped: picEmailStopped })
+                }).catch(() => {});
+            } else if (isGoogleAppsScript) {
+                google.script.run.saveCylinderTransaction({ action: 'saveEmailConfig', emailUrl: picEmailUrl, frequency: picEmailFreq, stopped: picEmailStopped });
+            }
+
+            alert("Tetapan Emel PIC berjaya disimpan!");
+        }
+
+        // --- PENGURUSAN URL GOOGLE SHEETS ---
+        function updateStatusUI() {
+            const pendingBadge = document.getElementById('pendingQueueBadge');
             if (offlineQueue.length > 0) {
-                pendingBadge.innerText = `${offlineQueue.length} Pending Sync`;
+                pendingBadge.innerText = `${offlineQueue.length} Pending`;
                 pendingBadge.classList.remove('hidden');
             } else {
                 pendingBadge.classList.add('hidden');
-            }
-
-            // Paparkan pautan terus ke fail Google Sheets jika ada
-            if (customSheetViewUrl) {
-                openSheetBtn.href = customSheetViewUrl;
-                openSheetBtn.classList.remove('hidden');
-            } else {
-                openSheetBtn.classList.add('hidden');
-            }
-
-            // Tentukan URL yang dipaparkan
-            if (customWebAppUrl) {
-                urlDisplay.innerText = customWebAppUrl;
-                syncDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
-                statusText.innerText = "Auto-Sync Google Sheets Aktif (URL Tersuai)";
-            } else if (isGoogleAppsScript) {
-                urlDisplay.innerText = customSheetViewUrl || "Sambungan Terus Google Apps Script (Native)";
-                syncDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
-                statusText.innerText = "Auto-Sync Google Sheets Aktif (Native)";
-            } else {
-                urlDisplay.innerText = "Tiada URL Google Sheets ditetapkan. Klik 'Edit URL' untuk sambung.";
-                syncDot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
-                statusText.innerText = "Mod Luar Talian (Sila Tetapkan URL Web App)";
             }
         }
 
         function openUrlConfigModal() {
             document.getElementById('inputWebAppUrl').value = customWebAppUrl;
             document.getElementById('inputSheetViewUrl').value = customSheetViewUrl;
-            document.getElementById('toggleAutoSync').checked = autoSyncEnabled;
             document.getElementById('urlConfigModal').classList.remove('hidden');
         }
 
@@ -603,81 +591,38 @@
         function saveUrlConfig() {
             customWebAppUrl = document.getElementById('inputWebAppUrl').value.trim();
             customSheetViewUrl = document.getElementById('inputSheetViewUrl').value.trim();
-            autoSyncEnabled = document.getElementById('toggleAutoSync').checked;
 
             localStorage.setItem('ikn_webapp_url', customWebAppUrl);
             localStorage.setItem('ikn_sheet_view_url', customSheetViewUrl);
-            localStorage.setItem('ikn_autosync_enabled', String(autoSyncEnabled));
 
-            setupAutoSyncTimer();
-            updateUrlBannerUI();
             closeUrlConfigModal();
             syncNow(true);
-        }
-
-        function resetDefaultUrls() {
-            if (!confirm("Tetapkan semula URL kepada tetapan asal?")) return;
-            customWebAppUrl = '';
-            customSheetViewUrl = '';
-            localStorage.removeItem('ikn_webapp_url');
-            localStorage.removeItem('ikn_sheet_view_url');
-            updateUrlBannerUI();
-            closeUrlConfigModal();
-            syncNow(true);
-        }
-
-        function copyCurrentUrl() {
-            const textToCopy = customWebAppUrl || customSheetViewUrl || window.location.href;
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                setSyncBadge("URL Disalin!", "bg-blue-100 text-blue-800");
-                setTimeout(() => setSyncBadge("Diselaraskan", "bg-emerald-100 text-emerald-800"), 2000);
-            }).catch(() => {
-                prompt("Salin URL di bawah:", textToCopy);
-            });
-        }
-
-        function setupAutoSyncTimer() {
-            if (autoSyncIntervalId) clearInterval(autoSyncIntervalId);
-            if (autoSyncEnabled) {
-                autoSyncIntervalId = setInterval(() => {
-                    syncNow(false);
-                }, 30000); // Auto-sync setiap 30 saat
-            }
         }
 
         function markSyncTimestamp() {
             const nowStr = new Date().toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             const lbl = document.getElementById('lastSyncTimeLabel');
-            if (lbl) lbl.innerText = `Sync Terakhir: ${nowStr}`;
+            if (lbl) lbl.innerText = `Sync: ${nowStr}`;
         }
 
-        // Hantar rekod yang tertangguh dalam baris gilir luar talian (Offline Queue)
         async function processOfflineQueue() {
             if (offlineQueue.length === 0) return;
-            if (!customWebAppUrl && !isGoogleAppsScript) return;
-
-            setSyncBadge("Menyegerak Baris Gilir...", "bg-amber-100 text-amber-800");
             const remaining = [];
-
             for (const item of offlineQueue) {
                 const ok = await sendRecordToCloud(item, true);
                 if (!ok) remaining.push(item);
             }
-
             offlineQueue = remaining;
             localStorage.setItem('ikn_offline_queue', JSON.stringify(offlineQueue));
-            updateUrlBannerUI();
-
+            updateStatusUI();
             if (offlineQueue.length === 0) {
                 setSyncBadge("Semua Diselaraskan", "bg-emerald-100 text-emerald-800");
                 markSyncTimestamp();
             }
         }
 
-        // Fungsi menghantar 1 transaksi ke Google Sheets (sama ada melalui Web App URL atau Native GAS)
         function sendRecordToCloud(record, isSilent = false) {
             return new Promise((resolve) => {
-                // Pilihan 1: Jika pengguna menetapkan URL Web App Tersuai (atau berada di luar GAS)
                 if (customWebAppUrl) {
                     fetch(customWebAppUrl, {
                         method: 'POST',
@@ -691,17 +636,12 @@
                             localStorage.setItem('ikn_cylinders_cache', JSON.stringify(cylindersDb));
                             renderCylinderTable();
                         }
-                        if (data && data.sheetUrl && !customSheetViewUrl) {
-                            customSheetViewUrl = data.sheetUrl;
-                            localStorage.setItem('ikn_sheet_view_url', customSheetViewUrl);
-                        }
                         markSyncTimestamp();
-                        updateUrlBannerUI();
+                        updateStatusUI();
                         if (!isSilent) setSyncBadge("Auto-Sync Berjaya", "bg-emerald-100 text-emerald-800");
                         resolve(true);
                     })
                     .catch(() => {
-                        // Fallback mode no-cors jika pelayar menyekat bacaan respons redirect GAS
                         fetch(customWebAppUrl, {
                             method: 'POST',
                             mode: 'no-cors',
@@ -709,17 +649,12 @@
                             body: JSON.stringify(record)
                         }).then(() => {
                             markSyncTimestamp();
-                            if (!isSilent) setSyncBadge("Disimpan (Cloud)", "bg-emerald-100 text-emerald-800");
                             resolve(true);
-                        }).catch(err => {
-                            console.error("Ralat Auto-Sync:", err);
-                            resolve(false);
-                        });
+                        }).catch(() => resolve(false));
                     });
                     return;
                 }
 
-                // Pilihan 2: Sambungan Terus Google Apps Script (Native)
                 if (isGoogleAppsScript) {
                     google.script.run
                         .withSuccessHandler(res => {
@@ -728,19 +663,12 @@
                                 localStorage.setItem('ikn_cylinders_cache', JSON.stringify(cylindersDb));
                                 renderCylinderTable();
                             }
-                            if (res && res.sheetUrl && !customSheetViewUrl) {
-                                customSheetViewUrl = res.sheetUrl;
-                                localStorage.setItem('ikn_sheet_view_url', customSheetViewUrl);
-                            }
                             markSyncTimestamp();
-                            updateUrlBannerUI();
+                            updateStatusUI();
                             if (!isSilent) setSyncBadge("Auto-Sync Berjaya", "bg-emerald-100 text-emerald-800");
                             resolve(true);
                         })
-                        .withFailureHandler(err => {
-                            console.error("Ralat GAS:", err);
-                            resolve(false);
-                        })
+                        .withFailureHandler(() => resolve(false))
                         .saveCylinderTransaction(record);
                     return;
                 }
@@ -749,17 +677,12 @@
             });
         }
 
-        // Muat turun & segerakkan semua rekod daripada Google Sheets
         async function syncNow(showIndicator = true) {
             const icon = document.getElementById('syncIcon');
             if (showIndicator && icon) icon.classList.add('fa-spin');
 
-            // Hantar sebarang rekod tertangguh terlebih dahulu
-            if (offlineQueue.length > 0) {
-                await processOfflineQueue();
-            }
+            if (offlineQueue.length > 0) await processOfflineQueue();
 
-            // 1. Jika ada URL Web App Tersuai
             if (customWebAppUrl) {
                 try {
                     const sep = customWebAppUrl.includes('?') ? '&' : '?';
@@ -770,43 +693,38 @@
                         localStorage.setItem('ikn_cylinders_cache', JSON.stringify(cylindersDb));
                         renderCylinderTable();
                     }
-                    if (data && data.sheetUrl && !customSheetViewUrl) {
-                        customSheetViewUrl = data.sheetUrl;
-                        localStorage.setItem('ikn_sheet_view_url', customSheetViewUrl);
-                    }
                     markSyncTimestamp();
                     setSyncBadge("Diselaraskan", "bg-emerald-100 text-emerald-800");
                 } catch (e) {
-                    console.warn("Tidak dapat memuat turun senarai melalui URL:", e);
+                    console.warn("Sync ralat:", e);
                 } finally {
                     if (icon) icon.classList.remove('fa-spin');
-                    updateUrlBannerUI();
+                    updateStatusUI();
                 }
                 return;
             }
 
-            // 2. Jika berada di dalam Google Apps Script Native
             if (isGoogleAppsScript) {
                 google.script.run
                     .withSuccessHandler(info => {
                         if (icon) icon.classList.remove('fa-spin');
                         if (info) {
-                            if (info.webAppUrl && !customWebAppUrl) {
-                                customWebAppUrl = info.webAppUrl;
-                                localStorage.setItem('ikn_webapp_url', customWebAppUrl);
-                            }
-                            if (info.sheetUrl && !customSheetViewUrl) {
-                                customSheetViewUrl = info.sheetUrl;
-                                localStorage.setItem('ikn_sheet_view_url', customSheetViewUrl);
-                            }
+                            if (info.webAppUrl && !customWebAppUrl) customWebAppUrl = info.webAppUrl;
+                            if (info.sheetUrl && !customSheetViewUrl) customSheetViewUrl = info.sheetUrl;
                             if (Array.isArray(info.cylinders)) {
                                 cylindersDb = info.cylinders;
                                 localStorage.setItem('ikn_cylinders_cache', JSON.stringify(cylindersDb));
                                 renderCylinderTable();
                             }
+                            if (info.emailConfig) {
+                                picEmailUrl = info.emailConfig.emailUrl || picEmailUrl;
+                                picEmailFreq = info.emailConfig.frequency || picEmailFreq;
+                                picEmailStopped = info.emailConfig.stopped;
+                                updateEmailIconBadge();
+                            }
                         }
                         markSyncTimestamp();
-                        updateUrlBannerUI();
+                        updateStatusUI();
                         setSyncBadge("Diselaraskan", "bg-emerald-100 text-emerald-800");
                     })
                     .withFailureHandler(() => {
@@ -816,11 +734,11 @@
             } else {
                 if (icon) icon.classList.remove('fa-spin');
                 renderCylinderTable();
-                updateUrlBannerUI();
+                updateStatusUI();
             }
         }
 
-        // --- FUNGSI SEMAKAN TARIKH LUPUT & PAPAN PEMUKA ---
+        // --- DASHBOARD & TABLE ---
         function getDaysUntilExpiry(expiryStr) {
             if (!expiryStr) return null;
             const cleanDateStr = String(expiryStr).split('T')[0].trim();
@@ -856,7 +774,6 @@
                 } else {
                     loaned++;
                 }
-
                 if (isExpiringWithin30Days(c.expiry)) {
                     expiring++;
                 }
@@ -892,26 +809,19 @@
                     filterLabel.innerText = "Menapis: Silinder Pinjaman Semasa";
                     document.getElementById('cardStatLoaned').classList.add('ring-2', 'ring-amber-500');
                 } else if (filterType === 'EXPIRING') {
-                    filterLabel.innerText = "Menapis: Hampir Tamat Tempoh (< 30 Hari)";
+                    filterLabel.innerText = "Menapis: Hampir Luput (< 30 Hari)";
                     document.getElementById('cardStatExpiring').classList.add('ring-2', 'ring-rose-500');
                 }
             }
-
             renderCylinderTable();
         }
 
-        // Bunyi Chime apabila imbasan berjaya
         function playSuccessChime() {
             try {
                 const AudioContextClass = window.AudioContext || window.webkitAudioContext;
                 if (!AudioContextClass) return;
-                
-                if (!sharedAudioCtx) {
-                    sharedAudioCtx = new AudioContextClass();
-                }
-                if (sharedAudioCtx.state === 'suspended') {
-                    sharedAudioCtx.resume();
-                }
+                if (!sharedAudioCtx) sharedAudioCtx = new AudioContextClass();
+                if (sharedAudioCtx.state === 'suspended') sharedAudioCtx.resume();
 
                 const osc = sharedAudioCtx.createOscillator();
                 const gain = sharedAudioCtx.createGain();
@@ -924,19 +834,15 @@
                 gain.connect(sharedAudioCtx.destination);
                 osc.start();
                 osc.stop(sharedAudioCtx.currentTime + 0.32);
-            } catch (e) {
-                console.log("Audio tidak dapat dimainkan:", e);
-            }
+            } catch (e) {}
         }
 
         function setSelectValueSafely(selectId, value, fallbackValue) {
             const selectEl = document.getElementById(selectId);
             if (!selectEl) return;
             const targetVal = value || fallbackValue;
-            
             const options = Array.from(selectEl.options);
             const exactMatch = options.find(opt => opt.value === targetVal);
-            
             if (exactMatch) {
                 selectEl.value = targetVal;
             } else if (targetVal) {
@@ -952,12 +858,10 @@
 
         function syncNameWithType(typeVal) {
             const nameInput = document.getElementById('inputName');
-            if (!nameInput.disabled) {
-                nameInput.value = typeVal;
-            }
+            if (!nameInput.disabled) nameInput.value = typeVal;
         }
 
-        // --- FUNGSI DROPDOWN / AUTO-COMPLETE KAPASITI (KG) ---
+        // --- KAPASITI (KG) ---
         function onCapacityFocus() {
             const input = document.getElementById('inputCapacity');
             if (input.disabled) return;
@@ -993,9 +897,7 @@
             if (currentFilteredCapacities.length === 0) {
                 listEl.innerHTML = `<div class="p-2 text-[11px] text-slate-400 text-center">Nilai tersuai: ${q} kg</div>`;
             } else {
-                if (activeCapacityIndex < 0 || activeCapacityIndex >= currentFilteredCapacities.length) {
-                    activeCapacityIndex = 0;
-                }
+                if (activeCapacityIndex < 0 || activeCapacityIndex >= currentFilteredCapacities.length) activeCapacityIndex = 0;
                 listEl.innerHTML = currentFilteredCapacities.map((cap) => {
                     const isSelected = (cap === document.getElementById('inputCapacity').value.trim());
                     return `
@@ -1010,8 +912,7 @@
         }
 
         function selectCapacityValue(capVal) {
-            const input = document.getElementById('inputCapacity');
-            input.value = capVal;
+            document.getElementById('inputCapacity').value = capVal;
             hideCapacityDropdown();
         }
 
@@ -1023,21 +924,18 @@
         function handleCapacityKeyDown(e) {
             const listEl = document.getElementById('capacityAutocompleteList');
             const isVisible = !listEl.classList.contains('hidden');
-
             if (e.key === 'ArrowDown') {
                 e.preventDefault();
                 if (!isVisible) renderCapacityDropdown(e.target.value);
                 if (currentFilteredCapacities.length > 0) {
                     activeCapacityIndex = (activeCapacityIndex + 1) % currentFilteredCapacities.length;
                     selectCapacityValue(currentFilteredCapacities[activeCapacityIndex]);
-                    renderCapacityDropdown('');
                 }
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault();
                 if (currentFilteredCapacities.length > 0) {
                     activeCapacityIndex = (activeCapacityIndex - 1 + currentFilteredCapacities.length) % currentFilteredCapacities.length;
                     selectCapacityValue(currentFilteredCapacities[activeCapacityIndex]);
-                    renderCapacityDropdown('');
                 }
             } else if (e.key === 'Enter') {
                 if (isVisible && currentFilteredCapacities.length > 0) {
@@ -1049,19 +947,14 @@
             }
         }
 
-        // --- FUNGSI AUTO-COMPLETE 39 UNIT IKN ---
+        // --- UNIT IKN ---
         function initUnitAutocomplete() {
             renderQuickChips('');
-
             document.addEventListener('click', (e) => {
                 const unitWrap = document.getElementById('unitDetailWrap');
-                if (unitWrap && !unitWrap.contains(e.target)) {
-                    hideUnitDropdown();
-                }
+                if (unitWrap && !unitWrap.contains(e.target)) hideUnitDropdown();
                 const capWrap = document.getElementById('capacityWrap');
-                if (capWrap && !capWrap.contains(e.target)) {
-                    hideCapacityDropdown();
-                }
+                if (capWrap && !capWrap.contains(e.target)) hideCapacityDropdown();
             });
         }
 
@@ -1079,9 +972,8 @@
             });
 
             if (countLabel) countLabel.innerText = `${matched.length} Unit`;
-
             if (matched.length === 0) {
-                chipsContainer.innerHTML = `<span class="text-[11px] text-slate-400 py-1 px-2">Tiada unit sepadan dalam senarai IKN.</span>`;
+                chipsContainer.innerHTML = `<span class="text-[11px] text-slate-400 py-1 px-2">Tiada unit sepadan.</span>`;
                 return;
             }
 
@@ -1096,19 +988,13 @@
         }
 
         function onUnitInputFocus() {
-            if (selectedSubMenu === 'Unit') {
-                const val = document.getElementById('inputUnitDetail').value;
-                renderUnitDropdown(val);
-            }
+            if (selectedSubMenu === 'Unit') renderUnitDropdown(document.getElementById('inputUnitDetail').value);
         }
 
         function onUnitInputType(val) {
             const btnClear = document.getElementById('btnClearUnit');
-            if (val.trim().length > 0) {
-                btnClear.classList.remove('hidden');
-            } else {
-                btnClear.classList.add('hidden');
-            }
+            if (val.trim().length > 0) btnClear.classList.remove('hidden');
+            else btnClear.classList.add('hidden');
 
             if (selectedSubMenu === 'Unit') {
                 activeAutocompleteIndex = 0;
@@ -1119,7 +1005,6 @@
 
         function handleUnitKeyDown(e) {
             if (selectedSubMenu !== 'Unit') return;
-
             const listEl = document.getElementById('unitAutocompleteList');
             const isVisible = !listEl.classList.contains('hidden');
 
@@ -1160,33 +1045,16 @@
             });
 
             if (currentFilteredUnits.length === 0) {
-                listEl.innerHTML = `<div class="p-2.5 text-xs text-slate-400 text-center">Tiada unit IKN padan dengan "${q}".</div>`;
+                listEl.innerHTML = `<div class="p-2.5 text-xs text-slate-400 text-center">Tiada unit padan dengan "${q}".</div>`;
             } else {
-                if (activeAutocompleteIndex < 0 || activeAutocompleteIndex >= currentFilteredUnits.length) {
-                    activeAutocompleteIndex = 0;
-                }
-
+                if (activeAutocompleteIndex < 0 || activeAutocompleteIndex >= currentFilteredUnits.length) activeAutocompleteIndex = 0;
                 listEl.innerHTML = currentFilteredUnits.map((unit, idx) => {
                     const isActive = (idx === activeAutocompleteIndex);
-                    let highlightedText = unit;
-                    if (q.length > 0) {
-                        const matchIdx = unit.toUpperCase().indexOf(q);
-                        if (matchIdx > -1) {
-                            const before = unit.slice(0, matchIdx);
-                            const match = unit.slice(matchIdx, matchIdx + q.length);
-                            const after = unit.slice(matchIdx + q.length);
-                            highlightedText = `${before}<span class="bg-amber-200 text-slate-900 px-0.5 rounded">${match}</span>${after}`;
-                        }
-                    }
-
                     return `
-                    <div onclick="selectUnitValue('${unit}')" 
-                         data-idx="${idx}"
+                    <div onclick="selectUnitValue('${unit}')" data-idx="${idx}"
                          class="autocomplete-item px-3 py-2 text-xs font-bold cursor-pointer flex justify-between items-center transition ${isActive ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'}">
-                        <span>${highlightedText}</span>
-                        <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded ${isActive ? 'bg-emerald-200 text-emerald-900' : 'text-slate-400 bg-slate-100'}">
-                            ${idx === 0 && q.length > 0 ? 'Tekan Enter ↵' : 'Unit IKN'}
-                        </span>
+                        <span>${unit}</span>
+                        <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded ${isActive ? 'bg-emerald-200 text-emerald-900' : 'text-slate-400 bg-slate-100'}">IKN</span>
                     </div>`;
                 }).join('');
             }
@@ -1211,38 +1079,28 @@
         }
 
         function selectUnitValue(unitName) {
-            const input = document.getElementById('inputUnitDetail');
-            input.value = unitName;
+            document.getElementById('inputUnitDetail').value = unitName;
             document.getElementById('btnClearUnit').classList.remove('hidden');
             hideUnitDropdown();
             renderQuickChips(unitName);
         }
 
         function clearUnitInput() {
-            const input = document.getElementById('inputUnitDetail');
-            input.value = '';
+            document.getElementById('inputUnitDetail').value = '';
             document.getElementById('btnClearUnit').classList.add('hidden');
             renderQuickChips('');
-            if (selectedSubMenu === 'Unit') {
-                input.focus();
-                renderUnitDropdown('');
-            }
         }
 
-        // --- PENGENDALIAN IMBASAN & MODAL TRANSAKSI ---
+        // --- IMBASAN & TRANSAKSI ---
         function handleScanTrigger(rawCode) {
             const code = String(rawCode || '').trim().toUpperCase();
             if (!code) return;
 
             const now = Date.now();
-            if (code === lastScannedCode && (now - lastScannedTimestamp) < DOUBLE_SCAN_COOLDOWN_MS) {
-                console.log("Imbasan berganda disekat untuk:", code);
-                return;
-            }
+            if (code === lastScannedCode && (now - lastScannedTimestamp) < DOUBLE_SCAN_COOLDOWN_MS) return;
 
             lastScannedCode = code;
             lastScannedTimestamp = now;
-
             playSuccessChime();
 
             document.getElementById('manualCodeInput').value = '';
@@ -1267,15 +1125,12 @@
 
                 let mappedType = existingRecord.type || 'Oksigen';
                 if (mappedType.toLowerCase().includes('oxygen')) mappedType = 'Oksigen';
-                else if (mappedType.toLowerCase().includes('carbon')) mappedType = 'Karbon Dioksida';
-                else if (mappedType.toLowerCase().includes('nitrous')) mappedType = 'Nitrous Oksida';
 
                 document.getElementById('inputName').value = existingRecord.name || mappedType;
                 setSelectValueSafely('inputType', mappedType, 'Oksigen');
                 document.getElementById('inputCapacity').value = existingRecord.capacity ? String(existingRecord.capacity).replace(/kg/gi, '').trim() : '6';
                 document.getElementById('inputExpiry').value = existingRecord.expiry ? String(existingRecord.expiry).split('T')[0] : '';
                 setSelectValueSafely('inputOwnership', existingRecord.ownership, 'IKN-Owned (Milik IKN)');
-
                 toggleFormLock(true);
             } else {
                 badge.innerText = "Silinder Baharu";
@@ -1289,7 +1144,6 @@
                 defaultExp.setFullYear(defaultExp.getFullYear() + 3);
                 document.getElementById('inputExpiry').value = defaultExp.toISOString().split('T')[0];
                 setSelectValueSafely('inputOwnership', 'IKN-Owned (Milik IKN)', 'IKN-Owned (Milik IKN)');
-
                 toggleFormLock(false);
             }
 
@@ -1303,18 +1157,11 @@
             const fields = document.querySelectorAll('.cyl-field');
             fields.forEach(f => {
                 f.disabled = lock;
-                if (lock) {
-                    f.classList.add('bg-slate-100', 'text-slate-500');
-                    f.classList.remove('bg-white');
-                } else {
-                    f.classList.remove('bg-slate-100', 'text-slate-500');
-                    f.classList.add('bg-white');
-                }
+                if (lock) f.classList.add('bg-slate-100', 'text-slate-500');
+                else f.classList.remove('bg-slate-100', 'text-slate-500');
             });
             const btnUnlock = document.getElementById('btnUnlockEdit');
-            if (btnUnlock) {
-                btnUnlock.innerText = lock ? "Edit Butiran" : "Sedang Diedit";
-            }
+            if (btnUnlock) btnUnlock.innerText = lock ? "Edit Butiran" : "Sedang Diedit";
         }
 
         function closeScanModal() {
@@ -1369,22 +1216,21 @@
                 } else {
                     bTerimaUnit.className = "py-2 px-3 rounded-lg border border-emerald-600 bg-emerald-600 text-white text-xs font-semibold transition";
                     bPembekal.className = "py-2 px-3 rounded-lg border border-slate-300 bg-white text-slate-700 text-xs font-semibold transition";
-                    labelDetail.innerText = "Terima Dari Unit IKN (Auto-Complete):";
-                    inputDetail.placeholder = "Taip atau pilih Unit IKN (Cth: ICU, W5A, GOT...)";
+                    labelDetail.innerText = "Terima Dari Unit IKN:";
+                    inputDetail.placeholder = "Cari Unit (Cth: ICU, W5A, GOT...)";
                     chipsBox.classList.remove('hidden');
                     arrow.classList.remove('hidden');
                     renderQuickChips('');
                 }
             } else {
-                labelDetail.innerText = "Serah Ke Unit IKN (Auto-Complete):";
-                inputDetail.placeholder = "Taip atau pilih Unit IKN (Cth: ICU, W6A, CSSD...)";
+                labelDetail.innerText = "Serah Ke Unit IKN:";
+                inputDetail.placeholder = "Cari Unit (Cth: ICU, W6A, CSSD...)";
                 chipsBox.classList.remove('hidden');
                 arrow.classList.remove('hidden');
                 renderQuickChips('');
             }
         }
 
-        // Simpan Transaksi & Auto-Sync ke Google Sheets
         async function submitTransaction() {
             let unitVal = document.getElementById('inputUnitDetail').value.trim().toUpperCase();
 
@@ -1393,10 +1239,6 @@
                     alert("Sila pilih atau taip nama Unit IKN terlebih dahulu.");
                     document.getElementById('inputUnitDetail').focus();
                     return;
-                }
-                if (!IKN_UNITS.includes(unitVal) && currentFilteredUnits.length === 1) {
-                    unitVal = currentFilteredUnits[0];
-                    document.getElementById('inputUnitDetail').value = unitVal;
                 }
             }
 
@@ -1422,30 +1264,23 @@
             };
 
             const formattedSubCategory = unitVal ? `${selectedSubMenu} (${unitVal})` : selectedSubMenu;
-            const localDisplayRecord = {
-                ...payloadForServer,
-                subCategory: formattedSubCategory
-            };
+            const localDisplayRecord = { ...payloadForServer, subCategory: formattedSubCategory };
 
-            // Simpan 1 rekod unik dalam memori tempatan
             const idx = cylindersDb.findIndex(c => String(c.barcode).toUpperCase() === activeBarcode);
-            if (idx > -1) {
-                cylindersDb[idx] = localDisplayRecord;
-            } else {
-                cylindersDb.unshift(localDisplayRecord);
-            }
+            if (idx > -1) cylindersDb[idx] = localDisplayRecord;
+            else cylindersDb.unshift(localDisplayRecord);
+
             localStorage.setItem('ikn_cylinders_cache', JSON.stringify(cylindersDb));
             renderCylinderTable();
             closeScanModal();
 
-            // Auto-Sync terus ke Google Sheets
-            setSyncBadge("Auto-Sync...", "bg-amber-100 text-amber-800");
+            setSyncBadge("Menyimpan...", "bg-amber-100 text-amber-800");
             const synced = await sendRecordToCloud(payloadForServer, false);
             if (!synced) {
                 offlineQueue.push(payloadForServer);
                 localStorage.setItem('ikn_offline_queue', JSON.stringify(offlineQueue));
-                updateUrlBannerUI();
-                setSyncBadge("Disimpan (Pending Sync)", "bg-amber-100 text-amber-800");
+                updateStatusUI();
+                setSyncBadge("Pending Sync", "bg-amber-100 text-amber-800");
             }
         }
 
@@ -1453,10 +1288,9 @@
             const b = document.getElementById('recordBadge');
             if (!b) return;
             b.innerText = text;
-            b.className = `px-2.5 py-0.5 rounded-full font-bold text-[10px] ${cls}`;
+            b.className = `px-2 py-0.5 rounded-full font-bold text-[10px] ${cls}`;
         }
 
-        // Paparkan Jadual Silinder & Kemas Kini Papan Pemuka
         function renderCylinderTable() {
             updateDashboardSummary();
 
@@ -1528,7 +1362,6 @@
             }).join('');
         }
 
-        // Kawalan Tab Mod Input
         async function switchMode(mode) {
             document.getElementById('panelKeyboard').classList.add('hidden');
             document.getElementById('panelCamera').classList.add('hidden');
@@ -1538,9 +1371,7 @@
                 document.getElementById(id).className = "py-2.5 px-2 text-xs font-semibold rounded-xl border border-slate-200 bg-white text-slate-600 transition flex flex-col items-center gap-1";
             });
 
-            if (mode !== 'camera') {
-                await stopCamera();
-            }
+            if (mode !== 'camera') await stopCamera();
 
             if (mode === 'keyboard') {
                 document.getElementById('panelKeyboard').classList.remove('hidden');
@@ -1553,7 +1384,6 @@
             } else if (mode === 'nfc') {
                 document.getElementById('panelNfc').classList.remove('hidden');
                 document.getElementById('tabNfc').className = "py-2.5 px-2 text-xs font-semibold rounded-xl border border-emerald-600 bg-emerald-50 text-emerald-700 transition flex flex-col items-center gap-1";
-                
                 if (isInIframe) {
                     document.getElementById('nfcIframeWarning').classList.remove('hidden');
                     setTimeout(() => document.getElementById('nfcFallbackInput').focus(), 150);
@@ -1561,33 +1391,24 @@
             }
         }
 
-        // Fungsi Kamera QR/Barcode
         async function startCamera() {
             const errEl = document.getElementById('cameraErrorMsg');
             if (errEl) errEl.classList.add('hidden');
-
             if (isCameraTransitioning) return;
             isCameraTransitioning = true;
 
             try {
-                if (!html5QrScanner) {
-                    html5QrScanner = new Html5Qrcode("qrReader");
-                }
-                if (html5QrScanner.isScanning) {
-                    await html5QrScanner.stop();
-                }
+                if (!html5QrScanner) html5QrScanner = new Html5Qrcode("qrReader");
+                if (html5QrScanner.isScanning) await html5QrScanner.stop();
                 await html5QrScanner.start(
                     { facingMode: "environment" },
                     { fps: 10, qrbox: { width: 240, height: 140 } },
-                    (decodedText) => {
-                        handleScanTrigger(decodedText);
-                    },
+                    (decodedText) => handleScanTrigger(decodedText),
                     () => {}
                 );
             } catch (err) {
-                console.warn("Kamera tidak dapat diakses:", err);
                 if (errEl) {
-                    errEl.innerText = "Kamera tidak dapat diakses. Sila benarkan akses kamera pada pelayar anda.";
+                    errEl.innerText = "Kamera tidak dapat diakses.";
                     errEl.classList.remove('hidden');
                 }
             } finally {
@@ -1602,56 +1423,34 @@
                     isCameraTransitioning = true;
                     await html5QrScanner.stop();
                 }
-            } catch (e) {
-                console.warn("Ralat menutup kamera:", e);
-            } finally {
+            } catch (e) {} finally {
                 isCameraTransitioning = false;
             }
         }
 
-        // Fungsi Web NFC Sebenar
         async function activateNfcReader() {
             if (isInIframe) {
                 document.getElementById('nfcIframeWarning').classList.remove('hidden');
-                document.getElementById('nfcTitle').innerText = "Mod Input NFC Pantas Aktif";
-                document.getElementById('nfcDesc').innerText = "Sila gunakan kotak input NFC di bawah untuk mengimbas tanpa ralat sekatan iframe.";
                 document.getElementById('nfcFallbackInput').focus();
                 return;
             }
-
             if (!('NDEFReader' in window)) {
-                alert("Peranti atau pelayar ini tidak menyokong Web NFC. Sila gunakan Google Chrome di Android.");
+                alert("Web NFC tidak disokong pada pelayar ini.");
                 return;
             }
-
             try {
                 const ndef = new NDEFReader();
                 await ndef.scan();
-                
-                document.getElementById('nfcTitle').innerText = "Sedia Mengimbas Tag NFC...";
-                document.getElementById('nfcDesc').innerText = "Sila sentuh belakang telefon anda pada tag NFC silinder sekarang.";
-                const btn = document.getElementById('btnStartNfc');
-                btn.innerText = "Menunggu Sentuhan Tag...";
-                btn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
-                btn.classList.add('bg-amber-600', 'hover:bg-amber-700');
-
                 ndef.onreading = event => {
                     let tagId = event.serialNumber ? event.serialNumber.replace(/:/g, '').toUpperCase() : '';
                     const decoder = new TextDecoder();
-                    
                     for (const record of event.message.records) {
-                        if (record.recordType === "text") {
-                            tagId = decoder.decode(record.payload);
-                        }
+                        if (record.recordType === "text") tagId = decoder.decode(record.payload);
                     }
-                    
-                    if (tagId) {
-                        handleScanTrigger(tagId);
-                    }
+                    if (tagId) handleScanTrigger(tagId);
                 };
             } catch (err) {
                 document.getElementById('nfcIframeWarning').classList.remove('hidden');
-                console.warn("Sekatan Web NFC:", err);
             }
         }
 
@@ -1660,25 +1459,21 @@
             clearTimeout(nfcTypingTimer);
             const val = inputEl.value.trim();
             if (val.length >= 6) {
-                nfcTypingTimer = setTimeout(() => {
-                    handleScanTrigger(val);
-                }, 400);
+                nfcTypingTimer = setTimeout(() => handleScanTrigger(val), 400);
             }
         }
 
-        // Auto-sync apabila peranti kembali dalam talian (Online)
         window.addEventListener('online', () => {
             processOfflineQueue();
             syncNow(false);
         });
 
-        // Mulakan aplikasi
         window.addEventListener('DOMContentLoaded', () => {
             initUnitAutocomplete();
-            updateUrlBannerUI();
+            updateEmailIconBadge();
+            updateStatusUI();
             renderCylinderTable();
             syncNow(true);
-            setupAutoSyncTimer();
         });
     </script>
 </body>
