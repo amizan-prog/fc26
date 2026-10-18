@@ -114,7 +114,7 @@
                         Sekatan Iframe Google Apps Script Dikesan
                     </div>
                     <p class="text-[11px] leading-relaxed">
-                        Pelayar Chrome menyekat imbasan terus <code>Web NFC</code> kerana Google Apps Script memaparkan halaman ini di dalam <b>iframe</b> (<code>googleusercontent.com</code>).
+                        Pelayar Chrome menyekat imbasan terus <code>Web NFC</code> kerana Google Apps Script memaparkan halaman ini di dalam <b>iframe</b> (<code>googleusercontent.com</code>)[cite: 1].
                     </p>
                     <div class="bg-white p-2.5 rounded-lg border border-amber-200 space-y-2">
                         <p class="text-[11px] font-semibold text-slate-700">Penyelesaian Segera (Tanpa Ralat):</p>
@@ -188,4 +188,778 @@
                     <i class="fa-solid fa-pen-to-square mr-1"></i>
                     <b>Silinder Sedia Ada!</b> Hanya 1 rekod disimpan dalam pangkalan data.
                 </div>
-                <button onclick="toggleFormLock(false)" id="btnUnlockEdit" class="bg-blue-600 hover:bg-blue-7
+                <button onclick="toggleFormLock(false)" id="btnUnlockEdit" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shrink-0 ml-2">
+                    Edit Butiran
+                </button>
+            </div>
+
+            <!-- Borang Butiran Silinder -->
+            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-3">
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Nama Silinder / Gas</label>
+                        <input type="text" id="inputName" class="cyl-field w-full text-xs p-2 border border-slate-300 rounded-lg bg-white" placeholder="Cth: Oxygen">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Jenis (Saiz/Kod)</label>
+                        <select id="inputType" class="cyl-field w-full text-xs p-2 border border-slate-300 rounded-lg bg-white">
+                            <option value="Oxygen (F-Size)">Oxygen (F-Size)</option>
+                            <option value="Oxygen (D-Size)">Oxygen (D-Size)</option>
+                            <option value="Oxygen (E-Size)">Oxygen (E-Size)</option>
+                            <option value="Nitrous Oxide">Nitrous Oxide</option>
+                            <option value="Medical Air">Medical Air</option>
+                            <option value="Carbon Dioxide">Carbon Dioxide</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Kapasiti</label>
+                        <input type="text" id="inputCapacity" class="cyl-field w-full text-xs p-2 border border-slate-300 rounded-lg bg-white" placeholder="Cth: 1360L / 40L">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Tarikh Luput</label>
+                        <input type="date" id="inputExpiry" class="cyl-field w-full text-xs p-2 border border-slate-300 rounded-lg bg-white">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Status Hak Milik (Loaned / Owned)</label>
+                    <select id="inputOwnership" class="cyl-field w-full text-xs p-2 border border-slate-300 rounded-lg bg-white font-medium">
+                        <option value="IKN-Owned (Milik IKN)">IKN-Owned (Milik IKN)</option>
+                        <option value="Loaned (Pinjaman Pembekal)">Loaned (Pinjaman Pembekal)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- MENU UTAMA SELEPAS IMBASAN: 1) TERIMA, 2) SERAH -->
+            <div class="space-y-3 pt-1">
+                <label class="block text-xs font-bold text-slate-700">Pilih Menu Pergerakan:</label>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <button type="button" onclick="selectMainMenu('Terima')" id="menuBtnTerima" 
+                            class="py-3 px-3 rounded-xl border-2 border-emerald-600 bg-emerald-50 text-emerald-800 text-xs font-bold flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-download"></i> 1) Terima
+                    </button>
+                    <button type="button" onclick="selectMainMenu('Serah')" id="menuBtnSerah" 
+                            class="py-3 px-3 rounded-xl border-2 border-slate-200 bg-white text-slate-600 text-xs font-bold flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-upload"></i> 2) Serah
+                    </button>
+                </div>
+
+                <!-- Sub-Menu di bawah 1) TERIMA: 1) Dari Pembekal, 2) Unit -->
+                <div id="subMenuTerimaBox" class="space-y-2 bg-emerald-50/50 p-3 rounded-xl border border-emerald-100">
+                    <span class="text-[11px] font-bold text-emerald-800 block">Sub-Menu Terima:</span>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="selectSubMenu('Dari Pembekal')" id="btnSubPembekal" 
+                                class="py-2 px-3 rounded-lg border border-emerald-600 bg-emerald-600 text-white text-xs font-semibold transition">
+                            1) Dari Pembekal
+                        </button>
+                        <button type="button" onclick="selectSubMenu('Unit')" id="btnSubTerimaUnit" 
+                                class="py-2 px-3 rounded-lg border border-slate-300 bg-white text-slate-700 text-xs font-semibold transition">
+                            2) Unit
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sub-Menu di bawah 2) SERAH: Unit -->
+                <div id="subMenuSerahBox" class="hidden space-y-2 bg-indigo-50/50 p-3 rounded-xl border border-indigo-100">
+                    <span class="text-[11px] font-bold text-indigo-800 block">Sub-Menu Serah:</span>
+                    <button type="button" onclick="selectSubMenu('Unit')" id="btnSubSerahUnit" 
+                            class="w-full py-2 px-3 rounded-lg border border-indigo-600 bg-indigo-600 text-white text-xs font-semibold transition">
+                        Unit (Serahan ke Unit / Wad IKN)
+                    </button>
+                </div>
+
+                <!-- Input Auto-Complete Unit IKN / Catatan Pembekal -->
+                <div id="unitDetailWrap" class="space-y-2 relative">
+                    <div class="flex justify-between items-center">
+                        <label id="unitDetailLabel" class="block text-[11px] font-semibold text-slate-700">Pilih atau Taip Nama Unit IKN:</label>
+                        <button type="button" onclick="clearUnitInput()" id="btnClearUnit" class="hidden text-[10px] text-rose-600 font-semibold hover:underline">
+                            Kosongkan
+                        </button>
+                    </div>
+
+                    <div class="relative">
+                        <input type="text" id="inputUnitDetail" 
+                               autocomplete="off"
+                               onfocus="onUnitInputFocus()"
+                               oninput="onUnitInputType(this.value)"
+                               onkeydown="handleUnitKeyDown(event)"
+                               placeholder="Taip untuk auto-complete unit (Cth: ICU, W5A, PETCT(F)...)" 
+                               class="w-full text-xs p-2.5 pr-8 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold text-slate-800 bg-white uppercase">
+                        <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-slate-400 text-xs pointer-events-none" id="unitDropdownArrow"></i>
+
+                        <!-- Senarai Dropdown Auto-Complete Interaktif -->
+                        <div id="unitAutocompleteList" class="hidden absolute left-0 right-0 mt-1 bg-white border border-slate-300 rounded-xl shadow-lg max-h-48 overflow-y-auto z-50 divide-y divide-slate-100">
+                        </div>
+                    </div>
+
+                    <!-- Paparan Butang Cip Pantas semua 39 Unit IKN -->
+                    <div id="unitQuickChipsBox" class="hidden space-y-1.5 pt-1">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-slate-500 font-medium">Senarai Pantas 39 Unit IKN (Klik untuk pilih):</span>
+                            <span id="unitMatchCount" class="text-[10px] font-bold text-emerald-700">39 Unit</span>
+                        </div>
+                        <div id="unitQuickChips" class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-2 bg-slate-100/80 rounded-xl border border-slate-200">
+                            <!-- Dijana secara automatik oleh JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Butang Simpan -->
+            <button type="button" onclick="submitTransaction()" id="btnSubmitSave" 
+                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl text-sm font-bold shadow-md transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Simpan Transaksi
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Senarai Rasmi 39 Unit di Institut Kanser Negara (IKN)
+        const IKN_UNITS = [
+            "ICU", "W5A", "W6A", "W6B", "W7A", "W7B", "ADM", "BOT", "CSSD", "DCO", 
+            "HNU", "IFS", "GOT", "PAT", "PHY", "TCM", "IPC", "UKA", "RKD", "PPD", 
+            "W8A", "W8B", "W9A", "W9B", "DIET", "ED", "MOR", "MDC", "NM189", "NMC", 
+            "ONC", "PETCT(F)", "RADIO", "RTC", "RTT", "WRR", "OPC", "CDR/TPN", "PETCT(N)"
+        ];
+
+        // Pangkalan data tempatan & senarai silinder
+        let cylindersDb = JSON.parse(localStorage.getItem('ikn_cylinders_cache')) || [];
+        let activeBarcode = '';
+        let selectedAction = 'Terima';
+        let selectedSubMenu = 'Dari Pembekal';
+        
+        // Indeks navigasi papan kekunci bagi auto-complete unit
+        let activeAutocompleteIndex = -1;
+        let currentFilteredUnits = [...IKN_UNITS];
+
+        // Kawalan Anti-Double Scan
+        let lastScannedCode = '';
+        let lastScannedTimestamp = 0;
+        const DOUBLE_SCAN_COOLDOWN_MS = 3000;
+
+        let html5QrScanner = null;
+
+        // Semak sama ada dijalankan di dalam Google Apps Script & Iframe
+        const isGoogleAppsScript = (typeof google !== 'undefined' && google.script && google.script.run);
+        const isInIframe = (window.self !== window.top);
+
+        // 1. Bunyi Chime apabila imbasan berjaya (Web Audio API)
+        function playSuccessChime() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(659.25, ctx.currentTime); // E5
+                osc.frequency.exponentialRampToValueAtTime(987.77, ctx.currentTime + 0.14); // B5
+                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.32);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.32);
+            } catch (e) {
+                console.log("Audio tidak dapat dimainkan:", e);
+            }
+        }
+
+        // 2. Fungsi Auto-Complete & Cip Pantas Unit IKN
+        function initUnitAutocomplete() {
+            renderQuickChips('');
+
+            // Tutup senarai dropdown apabila klik di luar kotak
+            document.addEventListener('click', (e) => {
+                const wrap = document.getElementById('unitDetailWrap');
+                if (wrap && !wrap.contains(e.target)) {
+                    hideUnitDropdown();
+                }
+            });
+        }
+
+        function renderQuickChips(filterQuery) {
+            const chipsContainer = document.getElementById('unitQuickChips');
+            const countLabel = document.getElementById('unitMatchCount');
+            const q = String(filterQuery || '').trim().toUpperCase();
+
+            // Susun unit yang bermula dengan huruf carian di hadapan
+            const matched = IKN_UNITS.filter(u => u.toUpperCase().includes(q)).sort((a, b) => {
+                const aStarts = a.toUpperCase().startsWith(q);
+                const bStarts = b.toUpperCase().startsWith(q);
+                if (aStarts && !bStarts) return -1;
+                if (!aStarts && bStarts) return 1;
+                return 0;
+            });
+
+            if (countLabel) {
+                countLabel.innerText = `${matched.length} Unit`;
+            }
+
+            if (matched.length === 0) {
+                chipsContainer.innerHTML = `<span class="text-[11px] text-slate-400 py-1 px-2">Tiada unit sepadan dalam senarai IKN.</span>`;
+                return;
+            }
+
+            chipsContainer.innerHTML = matched.map(unit => {
+                const isSelected = (unit.toUpperCase() === q);
+                return `
+                <button type="button" onclick="selectUnitValue('${unit}')" 
+                        class="unit-chip px-2.5 py-1 text-[11px] font-bold rounded-lg border transition ${isSelected ? 'border-emerald-600 bg-emerald-600 text-white shadow-2xs' : 'border-slate-300 bg-white text-slate-700 hover:bg-emerald-600 hover:text-white hover:border-emerald-600'}">
+                    ${unit}
+                </button>`;
+            }).join('');
+        }
+
+        function onUnitInputFocus() {
+            if (selectedSubMenu === 'Unit') {
+                const val = document.getElementById('inputUnitDetail').value;
+                renderUnitDropdown(val);
+            }
+        }
+
+        function onUnitInputType(val) {
+            const btnClear = document.getElementById('btnClearUnit');
+            if (val.trim().length > 0) {
+                btnClear.classList.remove('hidden');
+            } else {
+                btnClear.classList.add('hidden');
+            }
+
+            if (selectedSubMenu === 'Unit') {
+                activeAutocompleteIndex = 0; // Fokus pada cadangan pertama secara automatik
+                renderUnitDropdown(val);
+                renderQuickChips(val);
+            }
+        }
+
+        // Navigasi kekunci ArrowDown, ArrowUp, dan Enter untuk Auto-Complete Unit
+        function handleUnitKeyDown(e) {
+            if (selectedSubMenu !== 'Unit') return;
+
+            const listEl = document.getElementById('unitAutocompleteList');
+            const isVisible = !listEl.classList.contains('hidden');
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (!isVisible) renderUnitDropdown(e.target.value);
+                if (currentFilteredUnits.length > 0) {
+                    activeAutocompleteIndex = (activeAutocompleteIndex + 1) % currentFilteredUnits.length;
+                    updateDropdownHighlight();
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (currentFilteredUnits.length > 0) {
+                    activeAutocompleteIndex = (activeAutocompleteIndex - 1 + currentFilteredUnits.length) % currentFilteredUnits.length;
+                    updateDropdownHighlight();
+                }
+            } else if (e.key === 'Enter') {
+                if (isVisible && currentFilteredUnits.length > 0) {
+                    e.preventDefault();
+                    const chosen = currentFilteredUnits[activeAutocompleteIndex >= 0 ? activeAutocompleteIndex : 0];
+                    if (chosen) selectUnitValue(chosen);
+                }
+            } else if (e.key === 'Escape') {
+                hideUnitDropdown();
+            }
+        }
+
+        function renderUnitDropdown(query) {
+            const listEl = document.getElementById('unitAutocompleteList');
+            const q = String(query || '').trim().toUpperCase();
+
+            // Utamakan unit yang bermula dengan huruf yang ditaip
+            currentFilteredUnits = IKN_UNITS.filter(u => u.toUpperCase().includes(q)).sort((a, b) => {
+                const aStarts = a.toUpperCase().startsWith(q);
+                const bStarts = b.toUpperCase().startsWith(q);
+                if (aStarts && !bStarts) return -1;
+                if (!aStarts && bStarts) return 1;
+                return 0;
+            });
+
+            if (currentFilteredUnits.length === 0) {
+                listEl.innerHTML = `<div class="p-2.5 text-xs text-slate-400 text-center">Tiada unit IKN padan dengan "${q}".</div>`;
+            } else {
+                if (activeAutocompleteIndex < 0 || activeAutocompleteIndex >= currentFilteredUnits.length) {
+                    activeAutocompleteIndex = 0;
+                }
+
+                listEl.innerHTML = currentFilteredUnits.map((unit, idx) => {
+                    const isActive = (idx === activeAutocompleteIndex);
+                    // Serlahkan huruf yang sepadan
+                    let highlightedText = unit;
+                    if (q.length > 0) {
+                        const matchIdx = unit.toUpperCase().indexOf(q);
+                        if (matchIdx > -1) {
+                            const before = unit.slice(0, matchIdx);
+                            const match = unit.slice(matchIdx, matchIdx + q.length);
+                            const after = unit.slice(matchIdx + q.length);
+                            highlightedText = `${before}<span class="bg-amber-200 text-slate-900 px-0.5 rounded">${match}</span>${after}`;
+                        }
+                    }
+
+                    return `
+                    <div onclick="selectUnitValue('${unit}')" 
+                         data-idx="${idx}"
+                         class="autocomplete-item px-3 py-2 text-xs font-bold cursor-pointer flex justify-between items-center transition ${isActive ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'}">
+                        <span>${highlightedText}</span>
+                        <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded ${isActive ? 'bg-emerald-200 text-emerald-900' : 'text-slate-400 bg-slate-100'}">
+                            ${idx === 0 && q.length > 0 ? 'Tekan Enter ↵' : 'Unit IKN'}
+                        </span>
+                    </div>`;
+                }).join('');
+            }
+            listEl.classList.remove('hidden');
+        }
+
+        function updateDropdownHighlight() {
+            const items = document.querySelectorAll('.autocomplete-item');
+            items.forEach((item, idx) => {
+                if (idx === activeAutocompleteIndex) {
+                    item.classList.add('bg-emerald-50', 'text-emerald-800');
+                    item.scrollIntoView({ block: 'nearest' });
+                } else {
+                    item.classList.remove('bg-emerald-50', 'text-emerald-800');
+                }
+            });
+        }
+
+        function hideUnitDropdown() {
+            const listEl = document.getElementById('unitAutocompleteList');
+            if (listEl) listEl.classList.add('hidden');
+        }
+
+        function selectUnitValue(unitName) {
+            const input = document.getElementById('inputUnitDetail');
+            input.value = unitName;
+            document.getElementById('btnClearUnit').classList.remove('hidden');
+            hideUnitDropdown();
+            renderQuickChips(unitName);
+        }
+
+        function clearUnitInput() {
+            const input = document.getElementById('inputUnitDetail');
+            input.value = '';
+            document.getElementById('btnClearUnit').classList.add('hidden');
+            renderQuickChips('');
+            if (selectedSubMenu === 'Unit') {
+                input.focus();
+                renderUnitDropdown('');
+            }
+        }
+
+        // 3. Pengendalian Imbasan Utama (Dengung Chime + Sekat Imbasan Berganda)
+        function handleScanTrigger(rawCode) {
+            const code = String(rawCode || '').trim().toUpperCase();
+            if (!code) return;
+
+            const now = Date.now();
+            if (code === lastScannedCode && (now - lastScannedTimestamp) < DOUBLE_SCAN_COOLDOWN_MS) {
+                console.log("Imbasan berganda disekat untuk:", code);
+                return;
+            }
+
+            lastScannedCode = code;
+            lastScannedTimestamp = now;
+
+            playSuccessChime();
+
+            document.getElementById('manualCodeInput').value = '';
+            const nfcFallback = document.getElementById('nfcFallbackInput');
+            if (nfcFallback) nfcFallback.value = '';
+
+            openTransactionModal(code);
+        }
+
+        // 4. Buka Modal & Semak Sama Ada Silinder Sudah Wujud Dalam Database
+        function openTransactionModal(code) {
+            activeBarcode = code;
+            document.getElementById('displayScannedId').innerText = `ID Silinder: ${code}`;
+
+            const existingRecord = cylindersDb.find(c => String(c.barcode).toUpperCase() === code);
+            const badge = document.getElementById('badgeRecordType');
+            const dupBanner = document.getElementById('duplicatePromptBanner');
+
+            if (existingRecord) {
+                badge.innerText = "Sedia Ada";
+                badge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700";
+                dupBanner.classList.remove('hidden');
+
+                document.getElementById('inputName').value = existingRecord.name || 'Oxygen';
+                document.getElementById('inputType').value = existingRecord.type || 'Oxygen (F-Size)';
+                document.getElementById('inputCapacity').value = existingRecord.capacity || '1360L';
+                document.getElementById('inputExpiry').value = existingRecord.expiry || '';
+                document.getElementById('inputOwnership').value = existingRecord.ownership || 'IKN-Owned (Milik IKN)';
+
+                toggleFormLock(true);
+            } else {
+                badge.innerText = "Silinder Baharu";
+                badge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700";
+                dupBanner.classList.add('hidden');
+
+                document.getElementById('inputName').value = 'Oxygen';
+                document.getElementById('inputType').value = 'Oxygen (F-Size)';
+                document.getElementById('inputCapacity').value = '1360L';
+                const defaultExp = new Date();
+                defaultExp.setFullYear(defaultExp.getFullYear() + 3);
+                document.getElementById('inputExpiry').value = defaultExp.toISOString().split('T')[0];
+                document.getElementById('inputOwnership').value = 'IKN-Owned (Milik IKN)';
+
+                toggleFormLock(false);
+            }
+
+            clearUnitInput();
+            selectMainMenu('Terima');
+            document.getElementById('scanModal').classList.remove('hidden');
+        }
+
+        function toggleFormLock(lock) {
+            const fields = document.querySelectorAll('.cyl-field');
+            fields.forEach(f => {
+                f.disabled = lock;
+                if (lock) {
+                    f.classList.add('bg-slate-100', 'text-slate-500');
+                    f.classList.remove('bg-white');
+                } else {
+                    f.classList.remove('bg-slate-100', 'text-slate-500');
+                    f.classList.add('bg-white');
+                }
+            });
+            const btnUnlock = document.getElementById('btnUnlockEdit');
+            if (btnUnlock) {
+                btnUnlock.innerText = lock ? "Edit Butiran" : "Sedang Diedit";
+            }
+        }
+
+        function closeScanModal() {
+            hideUnitDropdown();
+            document.getElementById('scanModal').classList.add('hidden');
+        }
+
+        // 5. Kawalan Menu: 1) Terima (Dari Pembekal / Unit) & 2) Serah (Unit)
+        function selectMainMenu(menu) {
+            selectedAction = menu;
+            const btnTerima = document.getElementById('menuBtnTerima');
+            const btnSerah = document.getElementById('menuBtnSerah');
+            const boxTerima = document.getElementById('subMenuTerimaBox');
+            const boxSerah = document.getElementById('subMenuSerahBox');
+
+            if (menu === 'Terima') {
+                btnTerima.className = "py-3 px-3 rounded-xl border-2 border-emerald-600 bg-emerald-50 text-emerald-800 text-xs font-bold flex items-center justify-center gap-2 transition";
+                btnSerah.className = "py-3 px-3 rounded-xl border-2 border-slate-200 bg-white text-slate-600 text-xs font-bold flex items-center justify-center gap-2 transition";
+                boxTerima.classList.remove('hidden');
+                boxSerah.classList.add('hidden');
+                selectSubMenu('Dari Pembekal');
+            } else {
+                btnSerah.className = "py-3 px-3 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-indigo-800 text-xs font-bold flex items-center justify-center gap-2 transition";
+                btnTerima.className = "py-3 px-3 rounded-xl border-2 border-slate-200 bg-white text-slate-600 text-xs font-bold flex items-center justify-center gap-2 transition";
+                boxSerah.classList.remove('hidden');
+                boxTerima.classList.add('hidden');
+                selectSubMenu('Unit');
+            }
+        }
+
+        function selectSubMenu(sub) {
+            selectedSubMenu = sub;
+            const bPembekal = document.getElementById('btnSubPembekal');
+            const bTerimaUnit = document.getElementById('btnSubTerimaUnit');
+            const labelDetail = document.getElementById('unitDetailLabel');
+            const inputDetail = document.getElementById('inputUnitDetail');
+            const chipsBox = document.getElementById('unitQuickChipsBox');
+            const arrow = document.getElementById('unitDropdownArrow');
+
+            hideUnitDropdown();
+            inputDetail.value = '';
+            document.getElementById('btnClearUnit').classList.add('hidden');
+
+            if (selectedAction === 'Terima') {
+                if (sub === 'Dari Pembekal') {
+                    bPembekal.className = "py-2 px-3 rounded-lg border border-emerald-600 bg-emerald-600 text-white text-xs font-semibold transition";
+                    bTerimaUnit.className = "py-2 px-3 rounded-lg border border-slate-300 bg-white text-slate-700 text-xs font-semibold transition";
+                    labelDetail.innerText = "Nama Pembekal / No. DO (Pilihan):";
+                    inputDetail.placeholder = "Cth: Linde / Mox / No. DO...";
+                    chipsBox.classList.add('hidden');
+                    arrow.classList.add('hidden');
+                } else {
+                    bTerimaUnit.className = "py-2 px-3 rounded-lg border border-emerald-600 bg-emerald-600 text-white text-xs font-semibold transition";
+                    bPembekal.className = "py-2 px-3 rounded-lg border border-slate-300 bg-white text-slate-700 text-xs font-semibold transition";
+                    labelDetail.innerText = "Terima Dari Unit IKN (Auto-Complete):";
+                    inputDetail.placeholder = "Taip atau pilih Unit IKN (Cth: ICU, W5A, GOT...)";
+                    chipsBox.classList.remove('hidden');
+                    arrow.classList.remove('hidden');
+                    renderQuickChips('');
+                }
+            } else {
+                labelDetail.innerText = "Serah Ke Unit IKN (Auto-Complete):";
+                inputDetail.placeholder = "Taip atau pilih Unit IKN (Cth: ICU, W6A, CSSD...)";
+                chipsBox.classList.remove('hidden');
+                arrow.classList.remove('hidden');
+                renderQuickChips('');
+            }
+        }
+
+        // 6. Simpan Transaksi (1 Rekod Unik dalam Senarai_Silinder + Log_Transaksi)
+        function submitTransaction() {
+            let unitVal = document.getElementById('inputUnitDetail').value.trim().toUpperCase();
+
+            // Jika sub-menu ialah Unit, pastikan pengguna memilih atau mengisi nama unit
+            if (selectedSubMenu === 'Unit') {
+                if (!unitVal) {
+                    alert("Sila pilih atau taip nama Unit IKN terlebih dahulu.");
+                    document.getElementById('inputUnitDetail').focus();
+                    return;
+                }
+                // Jika pengguna menaip separuh (cth: "PETCT(F") dan terdapat 1 padanan tepat dalam auto-complete, lengkapkan secara automatik
+                if (!IKN_UNITS.includes(unitVal) && currentFilteredUnits.length === 1) {
+                    unitVal = currentFilteredUnits[0];
+                    document.getElementById('inputUnitDetail').value = unitVal;
+                }
+            }
+
+            const record = {
+                barcode: activeBarcode,
+                name: document.getElementById('inputName').value.trim(),
+                type: document.getElementById('inputType').value,
+                capacity: document.getElementById('inputCapacity').value.trim(),
+                expiry: document.getElementById('inputExpiry').value,
+                ownership: document.getElementById('inputOwnership').value,
+                action: selectedAction,
+                subCategory: selectedSubMenu,
+                unitDetail: unitVal,
+                updatedAt: new Date().toLocaleString('ms-MY')
+            };
+
+            if (!record.name || !record.capacity) {
+                alert("Sila lengkapkan Nama Gas dan Kapasiti silinder.");
+                return;
+            }
+
+            const displaySub = record.unitDetail ? `${record.subCategory} (${record.unitDetail})` : record.subCategory;
+            const localRecord = { ...record, subCategory: displaySub };
+
+            // Kemaskini dalam memori tempatan (1 rekod unik sahaja)
+            const idx = cylindersDb.findIndex(c => String(c.barcode).toUpperCase() === activeBarcode);
+            if (idx > -1) {
+                cylindersDb[idx] = localRecord;
+            } else {
+                cylindersDb.unshift(localRecord);
+            }
+            localStorage.setItem('ikn_cylinders_cache', JSON.stringify(cylindersDb));
+            renderCylinderTable();
+            closeScanModal();
+
+            // Hantar ke Google Sheets melalui Google Apps Script
+            if (isGoogleAppsScript) {
+                setSyncBadge("Menyimpan...", "bg-amber-200 text-amber-900");
+                google.script.run
+                    .withSuccessHandler(res => {
+                        if (res && res.cylinders) {
+                            cylindersDb = res.cylinders;
+                            localStorage.setItem('ikn_cylinders_cache', JSON.stringify(cylindersDb));
+                            renderCylinderTable();
+                        }
+                        setSyncBadge("Disimpan", "bg-emerald-200 text-emerald-900");
+                    })
+                    .withFailureHandler(err => {
+                        console.error(err);
+                        setSyncBadge("Ralat Sync", "bg-rose-200 text-rose-900");
+                    })
+                    .saveCylinderTransaction(record);
+            }
+        }
+
+        function setSyncBadge(text, cls) {
+            const b = document.getElementById('recordBadge');
+            b.innerText = text;
+            b.className = `px-2 py-0.5 rounded-full font-bold text-[11px] ${cls}`;
+        }
+
+        // 7. Muat Turun Data daripada Google Sheets
+        function loadFromGoogleSheets() {
+            if (!isGoogleAppsScript) {
+                renderCylinderTable();
+                return;
+            }
+            const icon = document.getElementById('syncIcon');
+            icon.classList.add('fa-spin');
+            google.script.run
+                .withSuccessHandler(data => {
+                    icon.classList.remove('fa-spin');
+                    if (Array.isArray(data)) {
+                        cylindersDb = data;
+                        localStorage.setItem('ikn_cylinders_cache', JSON.stringify(cylindersDb));
+                        renderCylinderTable();
+                    }
+                })
+                .withFailureHandler(err => {
+                    icon.classList.remove('fa-spin');
+                    console.error("Gagal memuat turun:", err);
+                })
+                .getAllCylinders();
+        }
+
+        // 8. Paparkan Jadual Silinder
+        function renderCylinderTable() {
+            const tbody = document.getElementById('tableBody');
+            const filter = (document.getElementById('searchFilter').value || '').toLowerCase();
+            
+            const filtered = cylindersDb.filter(c => 
+                c.barcode.toLowerCase().includes(filter) ||
+                c.name.toLowerCase().includes(filter) ||
+                (c.subCategory && c.subCategory.toLowerCase().includes(filter))
+            );
+
+            document.getElementById('countCylinders').innerText = cylindersDb.length;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-5 text-center text-slate-400">Tiada rekod silinder ditemui.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(c => {
+                const isOwned = String(c.ownership).includes('IKN');
+                const isTerima = c.action === 'Terima';
+                return `
+                <tr class="hover:bg-slate-50 cursor-pointer transition" onclick="handleScanTrigger('${c.barcode}')">
+                    <td class="p-2.5 font-mono font-bold text-slate-800">${c.barcode}</td>
+                    <td class="p-2.5">
+                        <div class="font-semibold text-slate-800">${c.name}</div>
+                        <div class="text-[10px] text-slate-500">${c.type}</div>
+                    </td>
+                    <td class="p-2.5">
+                        <div class="text-slate-700 font-medium">${c.capacity}</div>
+                        <div class="text-[10px] text-slate-400">Luput: ${c.expiry || '-'}</div>
+                    </td>
+                    <td class="p-2.5">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isOwned ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                            ${isOwned ? 'Milik IKN' : 'Pinjam'}
+                        </span>
+                    </td>
+                    <td class="p-2.5">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isTerima ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">
+                            ${c.action}: ${c.subCategory}
+                        </span>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        // 9. Kawalan Tab Mod Input (Papan Kekunci / Kamera / NFC)
+        function switchMode(mode) {
+            document.getElementById('panelKeyboard').classList.add('hidden');
+            document.getElementById('panelCamera').classList.add('hidden');
+            document.getElementById('panelNfc').classList.add('hidden');
+
+            ['tabKb', 'tabCam', 'tabNfc'].forEach(id => {
+                document.getElementById(id).className = "py-2.5 px-2 text-xs font-semibold rounded-xl border border-slate-200 bg-white text-slate-600 transition flex flex-col items-center gap-1";
+            });
+
+            if (mode !== 'camera') stopCamera();
+
+            if (mode === 'keyboard') {
+                document.getElementById('panelKeyboard').classList.remove('hidden');
+                document.getElementById('tabKb').className = "py-2.5 px-2 text-xs font-semibold rounded-xl border border-emerald-600 bg-emerald-50 text-emerald-700 transition flex flex-col items-center gap-1";
+                document.getElementById('manualCodeInput').focus();
+            } else if (mode === 'camera') {
+                document.getElementById('panelCamera').classList.remove('hidden');
+                document.getElementById('tabCam').className = "py-2.5 px-2 text-xs font-semibold rounded-xl border border-emerald-600 bg-emerald-50 text-emerald-700 transition flex flex-col items-center gap-1";
+                startCamera();
+            } else if (mode === 'nfc') {
+                document.getElementById('panelNfc').classList.remove('hidden');
+                document.getElementById('tabNfc').className = "py-2.5 px-2 text-xs font-semibold rounded-xl border border-emerald-600 bg-emerald-50 text-emerald-700 transition flex flex-col items-center gap-1";
+                
+                if (isInIframe) {
+                    document.getElementById('nfcIframeWarning').classList.remove('hidden');
+                    setTimeout(() => document.getElementById('nfcFallbackInput').focus(), 150);
+                }
+            }
+        }
+
+        // 10. Fungsi Kamera QR/Barcode
+        function startCamera() {
+            if (!html5QrScanner) {
+                html5QrScanner = new Html5Qrcode("qrReader");
+            }
+            html5QrScanner.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 240, height: 140 } },
+                (decodedText) => {
+                    handleScanTrigger(decodedText);
+                },
+                () => {}
+            ).catch(err => {
+                console.warn("Kamera tidak dapat diakses:", err);
+            });
+        }
+
+        function stopCamera() {
+            if (html5QrScanner && html5QrScanner.isScanning) {
+                html5QrScanner.stop().catch(() => {});
+            }
+        }
+
+        // 11. Fungsi Web NFC Sebenar
+        async function activateNfcReader() {
+            if (isInIframe) {
+                document.getElementById('nfcIframeWarning').classList.remove('hidden');
+                document.getElementById('nfcTitle').innerText = "Mod Input NFC Pantas Aktif";
+                document.getElementById('nfcDesc').innerText = "Sila gunakan kotak input NFC di bawah untuk mengimbas tanpa ralat sekatan iframe.";
+                document.getElementById('nfcFallbackInput').focus();
+                return;
+            }
+
+            if (!('NDEFReader' in window)) {
+                alert("Peranti atau pelayar ini tidak menyokong Web NFC. Sila gunakan Google Chrome di Android.");
+                return;
+            }
+
+            try {
+                const ndef = new NDEFReader();
+                await ndef.scan();
+                
+                document.getElementById('nfcTitle').innerText = "Sedia Mengimbas Tag NFC...";
+                document.getElementById('nfcDesc').innerText = "Sila sentuh belakang telefon anda pada tag NFC silinder sekarang.";
+                document.getElementById('btnStartNfc').innerText = "Menunggu Sentuhan Tag...";
+                document.getElementById('btnStartNfc').classList.replace('bg-emerald-600', 'bg-amber-600');
+
+                ndef.onreading = event => {
+                    let tagId = event.serialNumber ? event.serialNumber.replace(/:/g, '').toUpperCase() : '';
+                    const decoder = new TextDecoder();
+                    
+                    for (const record of event.message.records) {
+                        if (record.recordType === "text") {
+                            tagId = decoder.decode(record.payload);
+                        }
+                    }
+                    
+                    if (tagId) {
+                        handleScanTrigger(tagId);
+                    }
+                };
+            } catch (err) {
+                document.getElementById('nfcIframeWarning').classList.remove('hidden');
+                console.warn("Sekatan Web NFC:", err);
+            }
+        }
+
+        let nfcTypingTimer = null;
+        function checkAutoNfcInput(inputEl) {
+            clearTimeout(nfcTypingTimer);
+            const val = inputEl.value.trim();
+            if (val.length >= 6) {
+                nfcTypingTimer = setTimeout(() => {
+                    handleScanTrigger(val);
+                }, 400);
+            }
+        }
+
+        // Mulakan aplikasi
+        window.onload = () => {
+            initUnitAutocomplete();
+            renderCylinderTable();
+            loadFromGoogleSheets();
+        };
+    </script>
+</body>
+</html>
