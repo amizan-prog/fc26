@@ -2,13 +2,13 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Inventori Silinder Gas - Logistik Farmasi IKN</title>
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS v3 CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Html5-Qrcode untuk imbasan kamera -->
     <script src="https://unpkg.com/html5-qrcode"></script>
-    <!-- FontAwesome -->
+    <!-- FontAwesome untuk ikon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
@@ -22,7 +22,7 @@
                 </h1>
                 <p class="text-[11px] text-emerald-100">Sistem Inventori Silinder Gas Bersepadu</p>
             </div>
-            <button onclick="loadFromGoogleSheets()" class="bg-emerald-800 hover:bg-emerald-900 text-xs px-3 py-1.5 rounded-lg border border-emerald-600 flex items-center gap-1.5 transition">
+            <button type="button" onclick="loadFromGoogleSheets()" class="bg-emerald-800 hover:bg-emerald-900 text-xs px-3 py-1.5 rounded-lg border border-emerald-600 flex items-center gap-1.5 transition">
                 <i class="fa-solid fa-arrows-rotate" id="syncIcon"></i> Segar Semula
             </button>
         </div>
@@ -32,7 +32,7 @@
     <main class="flex-1 max-w-xl w-full mx-auto p-4 space-y-4 pb-20">
 
         <!-- Status Sambungan Pangkalan Data -->
-        <div id="statusBanner" class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-3.5 py-2.5 rounded-xl text-xs flex justify-between items-center shadow-2xs">
+        <div id="statusBanner" class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-3.5 py-2.5 rounded-xl text-xs flex justify-between items-center shadow-sm">
             <span class="flex items-center gap-2 font-medium" id="statusText">
                 <i class="fa-solid fa-circle-check text-emerald-600"></i>
                 Bersambung dengan Google Sheets Team
@@ -40,8 +40,78 @@
             <span id="recordBadge" class="bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-full font-bold text-[11px]">Sedia</span>
         </div>
 
+        <!-- PAPAN PEMUKA RINGKAS (SIMPLE DASHBOARD) -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                    <i class="fa-solid fa-chart-pie text-emerald-600"></i> Ringkasan Inventori Semasa
+                </h2>
+                <button type="button" id="btnResetDashFilter" onclick="setDashboardFilter('ALL')" class="hidden text-[11px] text-emerald-700 font-bold hover:underline flex items-center gap-1">
+                    <i class="fa-solid fa-filter-circle-xmark"></i> Papar Semua
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <!-- 1. Jumlah Semasa Silinder -->
+                <div onclick="setDashboardFilter('ALL')" id="cardStatAll" class="cursor-pointer p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-100 transition flex flex-col justify-between">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[11px] font-semibold text-slate-500 leading-tight">Jumlah Semasa Silinder</span>
+                        <span class="w-6 h-6 rounded-lg bg-slate-200/80 text-slate-700 flex items-center justify-center text-xs shrink-0">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </span>
+                    </div>
+                    <div class="mt-2 flex items-baseline justify-between">
+                        <span id="statTotalCylinders" class="text-xl font-extrabold text-slate-800">0</span>
+                        <span class="text-[10px] text-slate-400 font-medium">Silinder</span>
+                    </div>
+                </div>
+
+                <!-- 2. Milik IKN Semasa -->
+                <div onclick="setDashboardFilter('OWNED')" id="cardStatOwned" class="cursor-pointer p-3 rounded-xl border border-emerald-200 bg-emerald-50/60 hover:bg-emerald-100/70 transition flex flex-col justify-between">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[11px] font-semibold text-emerald-800 leading-tight">Milik IKN Semasa</span>
+                        <span class="w-6 h-6 rounded-lg bg-emerald-200/80 text-emerald-800 flex items-center justify-center text-xs shrink-0">
+                            <i class="fa-solid fa-hospital"></i>
+                        </span>
+                    </div>
+                    <div class="mt-2 flex items-baseline justify-between">
+                        <span id="statOwnedCylinders" class="text-xl font-extrabold text-emerald-700">0</span>
+                        <span class="text-[10px] text-emerald-600 font-medium">IKN</span>
+                    </div>
+                </div>
+
+                <!-- 3. Pinjaman Semasa -->
+                <div onclick="setDashboardFilter('LOANED')" id="cardStatLoaned" class="cursor-pointer p-3 rounded-xl border border-amber-200 bg-amber-50/60 hover:bg-amber-100/70 transition flex flex-col justify-between">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[11px] font-semibold text-amber-900 leading-tight">Pinjaman Semasa</span>
+                        <span class="w-6 h-6 rounded-lg bg-amber-200/80 text-amber-800 flex items-center justify-center text-xs shrink-0">
+                            <i class="fa-solid fa-handshake"></i>
+                        </span>
+                    </div>
+                    <div class="mt-2 flex items-baseline justify-between">
+                        <span id="statLoanedCylinders" class="text-xl font-extrabold text-amber-700">0</span>
+                        <span class="text-[10px] text-amber-600 font-medium">Pinjam</span>
+                    </div>
+                </div>
+
+                <!-- 4. Hampir Tamat Tempoh (< 30 Hari) -->
+                <div onclick="setDashboardFilter('EXPIRING')" id="cardStatExpiring" class="cursor-pointer p-3 rounded-xl border border-rose-200 bg-rose-50/60 hover:bg-rose-100/70 transition flex flex-col justify-between">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[11px] font-semibold text-rose-900 leading-tight">Hampir Tamat Tempoh</span>
+                        <span class="w-6 h-6 rounded-lg bg-rose-200/80 text-rose-800 flex items-center justify-center text-xs shrink-0">
+                            <i class="fa-solid fa-clock"></i>
+                        </span>
+                    </div>
+                    <div class="mt-2 flex items-baseline justify-between">
+                        <span id="statExpiringCylinders" class="text-xl font-extrabold text-rose-600">0</span>
+                        <span class="text-[10px] text-rose-600 font-semibold">&lt; 30 Hari</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Panel Pilihan Mod Imbasan -->
-        <div class="bg-white rounded-2xl shadow-xs border border-slate-200 p-4 space-y-3">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                     <i class="fa-solid fa-qrcode text-emerald-600"></i> Mod Imbasan & Input
@@ -51,13 +121,13 @@
 
             <!-- 3 Tab Kaedah Input -->
             <div class="grid grid-cols-3 gap-2">
-                <button onclick="switchMode('keyboard')" id="tabKb" class="py-2.5 px-2 text-xs font-semibold rounded-xl border border-emerald-600 bg-emerald-50 text-emerald-700 transition flex flex-col items-center gap-1">
+                <button type="button" onclick="switchMode('keyboard')" id="tabKb" class="py-2.5 px-2 text-xs font-semibold rounded-xl border border-emerald-600 bg-emerald-50 text-emerald-700 transition flex flex-col items-center gap-1">
                     <i class="fa-solid fa-keyboard text-base"></i> Papan Kekunci
                 </button>
-                <button onclick="switchMode('camera')" id="tabCam" class="py-2.5 px-2 text-xs font-semibold rounded-xl border border-slate-200 bg-white text-slate-600 transition flex flex-col items-center gap-1">
+                <button type="button" onclick="switchMode('camera')" id="tabCam" class="py-2.5 px-2 text-xs font-semibold rounded-xl border border-slate-200 bg-white text-slate-600 transition flex flex-col items-center gap-1">
                     <i class="fa-solid fa-camera text-base"></i> Kamera QR/Bar
                 </button>
-                <button onclick="switchMode('nfc')" id="tabNfc" class="py-2.5 px-2 text-xs font-semibold rounded-xl border border-slate-200 bg-white text-slate-600 transition flex flex-col items-center gap-1">
+                <button type="button" onclick="switchMode('nfc')" id="tabNfc" class="py-2.5 px-2 text-xs font-semibold rounded-xl border border-slate-200 bg-white text-slate-600 transition flex flex-col items-center gap-1">
                     <i class="fa-solid fa-wifi text-base"></i> Tag NFC
                 </button>
             </div>
@@ -67,28 +137,29 @@
                 <div class="flex gap-2">
                     <input type="text" id="manualCodeInput" 
                            placeholder="Taip / Imbas Kod Bar atau Tag NFC..." 
-                           onkeydown="if(event.key === 'Enter') handleScanTrigger(this.value)"
-                           class="flex-1 px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                    <button onclick="handleScanTrigger(document.getElementById('manualCodeInput').value)" 
-                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-xs">
+                           onkeydown="if(event.key === 'Enter'){ event.preventDefault(); handleScanTrigger(this.value); }"
+                           class="flex-1 px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none uppercase font-mono">
+                    <button type="button" onclick="handleScanTrigger(document.getElementById('manualCodeInput').value)" 
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-sm">
                         SAHKAN
                     </button>
                 </div>
                 <!-- Butang Ujian Pantas -->
                 <div class="flex items-center gap-1.5 flex-wrap">
                     <span class="text-[11px] text-slate-400">Simulasi Pantas:</span>
-                    <button onclick="handleScanTrigger('EFTM03014')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] px-2.5 py-1 rounded-lg border border-slate-200 font-mono">EFTM03014</button>
-                    <button onclick="handleScanTrigger('MM4135502')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] px-2.5 py-1 rounded-lg border border-slate-200 font-mono">MM4135502</button>
-                    <button onclick="handleScanTrigger('GPT11875')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] px-2.5 py-1 rounded-lg border border-slate-200 font-mono">GPT11875</button>
+                    <button type="button" onclick="handleScanTrigger('EFTM03014')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] px-2.5 py-1 rounded-lg border border-slate-200 font-mono">EFTM03014</button>
+                    <button type="button" onclick="handleScanTrigger('MM4135502')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] px-2.5 py-1 rounded-lg border border-slate-200 font-mono">MM4135502</button>
+                    <button type="button" onclick="handleScanTrigger('GPT11875')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] px-2.5 py-1 rounded-lg border border-slate-200 font-mono">GPT11875</button>
                 </div>
             </div>
 
             <!-- 2. Mod Kamera QR / Barcode -->
             <div id="panelCamera" class="hidden space-y-2 pt-1">
                 <div id="qrReader" class="w-full rounded-xl overflow-hidden border border-slate-300 bg-slate-900 min-h-[220px]"></div>
+                <p id="cameraErrorMsg" class="hidden text-xs text-rose-600 text-center font-medium bg-rose-50 p-2 rounded-lg border border-rose-200"></p>
                 <div class="flex justify-between items-center text-[11px] text-slate-500 px-1">
                     <span>Halakan kamera pada kod bar atau QR silinder.</span>
-                    <button onclick="stopCamera()" class="text-rose-600 font-semibold hover:underline">Tutup Kamera</button>
+                    <button type="button" onclick="stopCamera()" class="text-rose-600 font-semibold hover:underline">Tutup Kamera</button>
                 </div>
             </div>
 
@@ -102,7 +173,7 @@
                     <p id="nfcDesc" class="text-[11px] text-slate-600 leading-relaxed">
                         Tekan butang di bawah dan rapatkan bahagian belakang telefon Android anda pada tag NFC silinder.
                     </p>
-                    <button onclick="activateNfcReader()" id="btnStartNfc" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-5 py-2.5 rounded-xl font-bold shadow-xs transition">
+                    <button type="button" onclick="activateNfcReader()" id="btnStartNfc" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-5 py-2.5 rounded-xl font-bold shadow-sm transition">
                         Aktifkan Imbasan NFC
                     </button>
                 </div>
@@ -111,20 +182,20 @@
                 <div id="nfcIframeWarning" class="hidden bg-amber-50 border border-amber-300 rounded-xl p-3.5 space-y-2.5 text-xs text-amber-900">
                     <div class="font-bold flex items-center gap-1.5 text-amber-800">
                         <i class="fa-solid fa-circle-info text-sm"></i>
-                        Sekatan Iframe Google Apps Script Dikesan
+                        Mod Input Pantas NFC (Sokongan Iframe)
                     </div>
                     <p class="text-[11px] leading-relaxed">
-                        Pelayar Chrome menyekat imbasan terus <code>Web NFC</code> kerana Google Apps Script memaparkan halaman ini di dalam <b>iframe</b> (<code>googleusercontent.com</code>)[cite: 1].
+                        Pelayar Chrome menyekat akses terus <code>Web NFC</code> kerana Google Apps Script memaparkan halaman di dalam <b>iframe</b> (<code>googleusercontent.com</code>)[cite: 1].
                     </p>
                     <div class="bg-white p-2.5 rounded-lg border border-amber-200 space-y-2">
-                        <p class="text-[11px] font-semibold text-slate-700">Penyelesaian Segera (Tanpa Ralat):</p>
+                        <p class="text-[11px] font-semibold text-slate-700">Imbas Menggunakan Papan Kekunci NFC / Tampal ID:</p>
                         <div class="flex gap-1.5 pt-1">
                             <input type="text" id="nfcFallbackInput" 
-                                   placeholder="Sentuh tag NFC (Mod Keyboard) / Tampal ID..." 
+                                   placeholder="Sentuh tag NFC / Tampal ID di sini..." 
                                    oninput="checkAutoNfcInput(this)"
-                                   onkeydown="if(event.key === 'Enter') handleScanTrigger(this.value)"
-                                   class="flex-1 px-3 py-2 text-xs border border-amber-400 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-amber-50/40 font-mono">
-                            <button onclick="handleScanTrigger(document.getElementById('nfcFallbackInput').value)" class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-xs font-bold">
+                                   onkeydown="if(event.key === 'Enter'){ event.preventDefault(); handleScanTrigger(this.value); }"
+                                   class="flex-1 px-3 py-2 text-xs border border-amber-400 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-amber-50/40 font-mono uppercase">
+                            <button type="button" onclick="handleScanTrigger(document.getElementById('nfcFallbackInput').value)" class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-xs font-bold">
                                 Teruskan
                             </button>
                         </div>
@@ -134,13 +205,16 @@
         </div>
 
         <!-- Senarai Pangkalan Data Silinder (1 Silinder = 1 Rekod Unik) -->
-        <div class="bg-white rounded-2xl shadow-xs border border-slate-200 p-4 space-y-3">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-                    <i class="fa-solid fa-database text-emerald-600"></i> Pangkalan Data Silinder (<span id="countCylinders">0</span>)
-                </h2>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3">
+            <div class="flex justify-between items-center gap-2">
+                <div>
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+                        <i class="fa-solid fa-database text-emerald-600"></i> Pangkalan Data Silinder (<span id="countCylinders">0</span>)
+                    </h2>
+                    <p id="activeFilterLabel" class="hidden text-[10px] font-semibold text-emerald-700 mt-0.5"></p>
+                </div>
                 <input type="text" id="searchFilter" oninput="renderCylinderTable()" placeholder="Cari ID / Gas / Unit..." 
-                       class="text-xs px-2.5 py-1 border border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 w-36">
+                       class="text-xs px-2.5 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 w-36 sm:w-44">
             </div>
 
             <div class="overflow-x-auto max-h-80 overflow-y-auto border border-slate-100 rounded-xl">
@@ -149,7 +223,7 @@
                         <tr>
                             <th class="p-2.5">Kod / ID</th>
                             <th class="p-2.5">Nama & Jenis</th>
-                            <th class="p-2.5">Kapasiti & Luput</th>
+                            <th class="p-2.5">Kapasiti (kg) & Luput</th>
                             <th class="p-2.5">Hak Milik</th>
                             <th class="p-2.5">Status Terkini</th>
                         </tr>
@@ -165,7 +239,7 @@
     </main>
 
     <!-- MODAL PENGESAHAN IMBASAN: EDIT BUTIRAN & MENU TERIMA / SERAH -->
-    <div id="scanModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div id="scanModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl max-h-[92vh] overflow-y-auto">
             
             <!-- Kepala Modal -->
@@ -177,7 +251,7 @@
                     </div>
                     <p id="displayScannedId" class="text-xs font-mono font-semibold text-emerald-700 mt-0.5"></p>
                 </div>
-                <button onclick="closeScanModal()" class="text-slate-400 hover:text-slate-600 text-lg px-1">
+                <button type="button" onclick="closeScanModal()" class="text-slate-400 hover:text-slate-600 text-lg px-1">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -186,9 +260,9 @@
             <div id="duplicatePromptBanner" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-3 flex items-center justify-between">
                 <div class="text-[11px] text-blue-800">
                     <i class="fa-solid fa-pen-to-square mr-1"></i>
-                    <b>Silinder Sedia Ada!</b> Hanya 1 rekod disimpan dalam pangkalan data.
+                    <b>Silinder Sedia Ada!</b> Hanya 1 rekod unik disimpan dalam pangkalan data.
                 </div>
-                <button onclick="toggleFormLock(false)" id="btnUnlockEdit" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shrink-0 ml-2">
+                <button type="button" onclick="toggleFormLock(false)" id="btnUnlockEdit" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shrink-0 ml-2">
                     Edit Butiran
                 </button>
             </div>
@@ -197,27 +271,41 @@
             <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-3">
                 <div class="grid grid-cols-2 gap-2.5">
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Nama Silinder / Gas</label>
-                        <input type="text" id="inputName" class="cyl-field w-full text-xs p-2 border border-slate-300 rounded-lg bg-white" placeholder="Cth: Oxygen">
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Nama Silinder</label>
+                        <input type="text" id="inputName" class="cyl-field w-full text-xs p-2 border border-slate-300 rounded-lg bg-white" placeholder="Cth: Oksigen">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Jenis (Saiz/Kod)</label>
-                        <select id="inputType" class="cyl-field w-full text-xs p-2 border border-slate-300 rounded-lg bg-white">
-                            <option value="Oxygen (F-Size)">Oxygen (F-Size)</option>
-                            <option value="Oxygen (D-Size)">Oxygen (D-Size)</option>
-                            <option value="Oxygen (E-Size)">Oxygen (E-Size)</option>
-                            <option value="Nitrous Oxide">Nitrous Oxide</option>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Jenis</label>
+                        <select id="inputType" onchange="syncNameWithType(this.value)" class="cyl-field w-full text-xs p-2 border border-slate-300 rounded-lg bg-white font-semibold">
+                            <option value="Oksigen">Oksigen</option>
+                            <option value="Karbon Dioksida">Karbon Dioksida</option>
+                            <option value="Nitrous Oksida">Nitrous Oksida</option>
                             <option value="Medical Air">Medical Air</option>
-                            <option value="Carbon Dioxide">Carbon Dioxide</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-2.5">
-                    <div>
-                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Kapasiti</label>
-                        <input type="text" id="inputCapacity" class="cyl-field w-full text-xs p-2 border border-slate-300 rounded-lg bg-white" placeholder="Cth: 1360L / 40L">
+                    <!-- Dropdown / Auto-Complete Kapasiti (kg) -->
+                    <div id="capacityWrap" class="relative">
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Kapasiti (kg)</label>
+                        <div class="relative">
+                            <input type="text" id="inputCapacity" 
+                                   autocomplete="off"
+                                   onfocus="onCapacityFocus()"
+                                   oninput="onCapacityInput(this.value)"
+                                   onkeydown="handleCapacityKeyDown(event)"
+                                   class="cyl-field w-full text-xs p-2 pr-7 border border-slate-300 rounded-lg bg-white font-semibold" 
+                                   placeholder="Pilih: 0.5 - 30">
+                            <button type="button" onclick="toggleCapacityDropdown()" class="cyl-field absolute right-2 top-2 text-slate-400 hover:text-slate-600 text-xs">
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <!-- Senarai Dropdown Auto-Complete Kapasiti (kg) -->
+                        <div id="capacityAutocompleteList" class="hidden absolute left-0 right-0 mt-1 bg-white border border-slate-300 rounded-xl shadow-lg max-h-44 overflow-y-auto z-50 divide-y divide-slate-100">
+                        </div>
                     </div>
+
                     <div>
                         <label class="block text-[11px] font-semibold text-slate-600 mb-1">Tarikh Luput</label>
                         <input type="date" id="inputExpiry" class="cyl-field w-full text-xs p-2 border border-slate-300 rounded-lg bg-white">
@@ -325,15 +413,27 @@
             "ONC", "PETCT(F)", "RADIO", "RTC", "RTT", "WRR", "OPC", "CDR/TPN", "PETCT(N)"
         ];
 
+        // Senarai Pilihan Kapasiti (kg)
+        const CAPACITY_OPTIONS = ["0.5", "0.7", "1.4", "2.4", "3", "6", "7", "30"];
+
         // Pangkalan data tempatan & senarai silinder
-        let cylindersDb = JSON.parse(localStorage.getItem('ikn_cylinders_cache')) || [];
+        let cylindersDb = [];
+        try {
+            cylindersDb = JSON.parse(localStorage.getItem('ikn_cylinders_cache')) || [];
+        } catch (e) {
+            cylindersDb = [];
+        }
+
         let activeBarcode = '';
         let selectedAction = 'Terima';
         let selectedSubMenu = 'Dari Pembekal';
+        let currentDashboardFilter = 'ALL'; // 'ALL' | 'OWNED' | 'LOANED' | 'EXPIRING'
         
-        // Indeks navigasi papan kekunci bagi auto-complete unit
+        // Indeks navigasi papan kekunci bagi auto-complete unit & kapasiti
         let activeAutocompleteIndex = -1;
         let currentFilteredUnits = [...IKN_UNITS];
+        let activeCapacityIndex = -1;
+        let currentFilteredCapacities = [...CAPACITY_OPTIONS];
 
         // Kawalan Anti-Double Scan
         let lastScannedCode = '';
@@ -341,28 +441,243 @@
         const DOUBLE_SCAN_COOLDOWN_MS = 3000;
 
         let html5QrScanner = null;
+        let isCameraTransitioning = false;
+        let sharedAudioCtx = null;
 
         // Semak sama ada dijalankan di dalam Google Apps Script & Iframe
         const isGoogleAppsScript = (typeof google !== 'undefined' && google.script && google.script.run);
         const isInIframe = (window.self !== window.top);
 
-        // 1. Bunyi Chime apabila imbasan berjaya (Web Audio API)
+        // Fungsi Semakan Tarikh Luput (< 30 Hari atau Telah Luput)
+        function getDaysUntilExpiry(expiryStr) {
+            if (!expiryStr) return null;
+            const cleanDateStr = String(expiryStr).split('T')[0].trim();
+            const parts = cleanDateStr.split('-');
+            if (parts.length !== 3) return null;
+
+            const expDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+            if (isNaN(expDate.getTime())) return null;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            expDate.setHours(0, 0, 0, 0);
+
+            const diffTime = expDate.getTime() - today.getTime();
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+
+        function isExpiringWithin30Days(expiryStr) {
+            const days = getDaysUntilExpiry(expiryStr);
+            return days !== null && days < 30;
+        }
+
+        // Kemas Kini Kiraan Papan Pemuka (Simple Dashboard)
+        function updateDashboardSummary() {
+            const total = cylindersDb.length;
+            let owned = 0;
+            let loaned = 0;
+            let expiring = 0;
+
+            cylindersDb.forEach(c => {
+                const ownStr = String(c.ownership || '').toUpperCase();
+                if (ownStr.includes('IKN') || ownStr.includes('OWNED') || ownStr.includes('MILIK')) {
+                    owned++;
+                } else {
+                    loaned++;
+                }
+
+                if (isExpiringWithin30Days(c.expiry)) {
+                    expiring++;
+                }
+            });
+
+            document.getElementById('statTotalCylinders').innerText = total;
+            document.getElementById('statOwnedCylinders').innerText = owned;
+            document.getElementById('statLoanedCylinders').innerText = loaned;
+            document.getElementById('statExpiringCylinders').innerText = expiring;
+        }
+
+        // Penapisan Apabila Kad Papan Pemuka Diklik
+        function setDashboardFilter(filterType) {
+            currentDashboardFilter = filterType;
+            const resetBtn = document.getElementById('btnResetDashFilter');
+            const filterLabel = document.getElementById('activeFilterLabel');
+
+            document.getElementById('cardStatAll').className = "cursor-pointer p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-100 transition flex flex-col justify-between";
+            document.getElementById('cardStatOwned').className = "cursor-pointer p-3 rounded-xl border border-emerald-200 bg-emerald-50/60 hover:bg-emerald-100/70 transition flex flex-col justify-between";
+            document.getElementById('cardStatLoaned').className = "cursor-pointer p-3 rounded-xl border border-amber-200 bg-amber-50/60 hover:bg-amber-100/70 transition flex flex-col justify-between";
+            document.getElementById('cardStatExpiring').className = "cursor-pointer p-3 rounded-xl border border-rose-200 bg-rose-50/60 hover:bg-rose-100/70 transition flex flex-col justify-between";
+
+            if (filterType === 'ALL') {
+                resetBtn.classList.add('hidden');
+                filterLabel.classList.add('hidden');
+                document.getElementById('cardStatAll').classList.add('ring-2', 'ring-slate-400');
+            } else {
+                resetBtn.classList.remove('hidden');
+                filterLabel.classList.remove('hidden');
+                if (filterType === 'OWNED') {
+                    filterLabel.innerText = "Menapis: Silinder Milik IKN Semasa";
+                    document.getElementById('cardStatOwned').classList.add('ring-2', 'ring-emerald-600');
+                } else if (filterType === 'LOANED') {
+                    filterLabel.innerText = "Menapis: Silinder Pinjaman Semasa";
+                    document.getElementById('cardStatLoaned').classList.add('ring-2', 'ring-amber-500');
+                } else if (filterType === 'EXPIRING') {
+                    filterLabel.innerText = "Menapis: Hampir Tamat Tempoh (< 30 Hari)";
+                    document.getElementById('cardStatExpiring').classList.add('ring-2', 'ring-rose-500');
+                }
+            }
+
+            renderCylinderTable();
+        }
+
+        // 1. Bunyi Chime apabila imbasan berjaya (Menggunakan 1 instance AudioContext)
         function playSuccessChime() {
             try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContextClass) return;
+                
+                if (!sharedAudioCtx) {
+                    sharedAudioCtx = new AudioContextClass();
+                }
+                if (sharedAudioCtx.state === 'suspended') {
+                    sharedAudioCtx.resume();
+                }
+
+                const osc = sharedAudioCtx.createOscillator();
+                const gain = sharedAudioCtx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(659.25, ctx.currentTime); // E5
-                osc.frequency.exponentialRampToValueAtTime(987.77, ctx.currentTime + 0.14); // B5
-                gain.gain.setValueAtTime(0.2, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.32);
+                osc.frequency.setValueAtTime(659.25, sharedAudioCtx.currentTime); // E5
+                osc.frequency.exponentialRampToValueAtTime(987.77, sharedAudioCtx.currentTime + 0.14); // B5
+                gain.gain.setValueAtTime(0.2, sharedAudioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, sharedAudioCtx.currentTime + 0.32);
                 osc.connect(gain);
-                gain.connect(ctx.destination);
+                gain.connect(sharedAudioCtx.destination);
                 osc.start();
-                osc.stop(ctx.currentTime + 0.32);
+                osc.stop(sharedAudioCtx.currentTime + 0.32);
             } catch (e) {
                 console.log("Audio tidak dapat dimainkan:", e);
+            }
+        }
+
+        // Fungsi pembantu untuk menetapkan nilai <select> dengan selamat
+        function setSelectValueSafely(selectId, value, fallbackValue) {
+            const selectEl = document.getElementById(selectId);
+            if (!selectEl) return;
+            const targetVal = value || fallbackValue;
+            
+            const options = Array.from(selectEl.options);
+            const exactMatch = options.find(opt => opt.value === targetVal);
+            
+            if (exactMatch) {
+                selectEl.value = targetVal;
+            } else if (targetVal) {
+                const newOpt = document.createElement('option');
+                newOpt.value = targetVal;
+                newOpt.text = targetVal;
+                selectEl.add(newOpt);
+                selectEl.value = targetVal;
+            } else {
+                selectEl.value = fallbackValue;
+            }
+        }
+
+        function syncNameWithType(typeVal) {
+            const nameInput = document.getElementById('inputName');
+            if (!nameInput.disabled) {
+                nameInput.value = typeVal;
+            }
+        }
+
+        // --- FUNGSI DROPDOWN / AUTO-COMPLETE KAPASITI (KG) ---
+        function onCapacityFocus() {
+            const input = document.getElementById('inputCapacity');
+            if (input.disabled) return;
+            renderCapacityDropdown('');
+        }
+
+        function toggleCapacityDropdown() {
+            const input = document.getElementById('inputCapacity');
+            if (input.disabled) return;
+            const listEl = document.getElementById('capacityAutocompleteList');
+            if (listEl.classList.contains('hidden')) {
+                input.focus();
+                renderCapacityDropdown('');
+            } else {
+                hideCapacityDropdown();
+            }
+        }
+
+        function onCapacityInput(val) {
+            activeCapacityIndex = 0;
+            renderCapacityDropdown(val);
+        }
+
+        function renderCapacityDropdown(query) {
+            const listEl = document.getElementById('capacityAutocompleteList');
+            const q = String(query || '').trim();
+
+            currentFilteredCapacities = CAPACITY_OPTIONS.filter(cap => cap.includes(q));
+            // Jika pengguna klik fokus tetapi sudah ada nilai tepat, paparkan semua pilihan supaya mudah tukar
+            if (q && CAPACITY_OPTIONS.includes(q) && currentFilteredCapacities.length === 1) {
+                currentFilteredCapacities = [...CAPACITY_OPTIONS];
+            }
+
+            if (currentFilteredCapacities.length === 0) {
+                listEl.innerHTML = `<div class="p-2 text-[11px] text-slate-400 text-center">Tiada dalam pilihan (Nilai tersuai: ${q} kg)</div>`;
+            } else {
+                if (activeCapacityIndex < 0 || activeCapacityIndex >= currentFilteredCapacities.length) {
+                    activeCapacityIndex = 0;
+                }
+                listEl.innerHTML = currentFilteredCapacities.map((cap, idx) => {
+                    const isSelected = (cap === document.getElementById('inputCapacity').value.trim());
+                    return `
+                    <div onclick="selectCapacityValue('${cap}')" 
+                         class="px-3 py-2 text-xs font-bold cursor-pointer flex justify-between items-center transition ${isSelected ? 'bg-emerald-50 text-emerald-700' : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'}">
+                        <span>${cap}</span>
+                        <span class="text-[10px] font-normal text-slate-400">kg</span>
+                    </div>`;
+                }).join('');
+            }
+            listEl.classList.remove('hidden');
+        }
+
+        function selectCapacityValue(capVal) {
+            const input = document.getElementById('inputCapacity');
+            input.value = capVal;
+            hideCapacityDropdown();
+        }
+
+        function hideCapacityDropdown() {
+            const listEl = document.getElementById('capacityAutocompleteList');
+            if (listEl) listEl.classList.add('hidden');
+        }
+
+        function handleCapacityKeyDown(e) {
+            const listEl = document.getElementById('capacityAutocompleteList');
+            const isVisible = !listEl.classList.contains('hidden');
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (!isVisible) renderCapacityDropdown(e.target.value);
+                if (currentFilteredCapacities.length > 0) {
+                    activeCapacityIndex = (activeCapacityIndex + 1) % currentFilteredCapacities.length;
+                    selectCapacityValue(currentFilteredCapacities[activeCapacityIndex]);
+                    renderCapacityDropdown('');
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (currentFilteredCapacities.length > 0) {
+                    activeCapacityIndex = (activeCapacityIndex - 1 + currentFilteredCapacities.length) % currentFilteredCapacities.length;
+                    selectCapacityValue(currentFilteredCapacities[activeCapacityIndex]);
+                    renderCapacityDropdown('');
+                }
+            } else if (e.key === 'Enter') {
+                if (isVisible && currentFilteredCapacities.length > 0) {
+                    e.preventDefault();
+                    selectCapacityValue(currentFilteredCapacities[activeCapacityIndex >= 0 ? activeCapacityIndex : 0]);
+                }
+            } else if (e.key === 'Escape') {
+                hideCapacityDropdown();
             }
         }
 
@@ -370,11 +685,14 @@
         function initUnitAutocomplete() {
             renderQuickChips('');
 
-            // Tutup senarai dropdown apabila klik di luar kotak
             document.addEventListener('click', (e) => {
-                const wrap = document.getElementById('unitDetailWrap');
-                if (wrap && !wrap.contains(e.target)) {
+                const unitWrap = document.getElementById('unitDetailWrap');
+                if (unitWrap && !unitWrap.contains(e.target)) {
                     hideUnitDropdown();
+                }
+                const capWrap = document.getElementById('capacityWrap');
+                if (capWrap && !capWrap.contains(e.target)) {
+                    hideCapacityDropdown();
                 }
             });
         }
@@ -384,7 +702,6 @@
             const countLabel = document.getElementById('unitMatchCount');
             const q = String(filterQuery || '').trim().toUpperCase();
 
-            // Susun unit yang bermula dengan huruf carian di hadapan
             const matched = IKN_UNITS.filter(u => u.toUpperCase().includes(q)).sort((a, b) => {
                 const aStarts = a.toUpperCase().startsWith(q);
                 const bStarts = b.toUpperCase().startsWith(q);
@@ -406,7 +723,7 @@
                 const isSelected = (unit.toUpperCase() === q);
                 return `
                 <button type="button" onclick="selectUnitValue('${unit}')" 
-                        class="unit-chip px-2.5 py-1 text-[11px] font-bold rounded-lg border transition ${isSelected ? 'border-emerald-600 bg-emerald-600 text-white shadow-2xs' : 'border-slate-300 bg-white text-slate-700 hover:bg-emerald-600 hover:text-white hover:border-emerald-600'}">
+                        class="unit-chip px-2.5 py-1 text-[11px] font-bold rounded-lg border transition ${isSelected ? 'border-emerald-600 bg-emerald-600 text-white shadow-sm' : 'border-slate-300 bg-white text-slate-700 hover:bg-emerald-600 hover:text-white hover:border-emerald-600'}">
                     ${unit}
                 </button>`;
             }).join('');
@@ -428,13 +745,12 @@
             }
 
             if (selectedSubMenu === 'Unit') {
-                activeAutocompleteIndex = 0; // Fokus pada cadangan pertama secara automatik
+                activeAutocompleteIndex = 0;
                 renderUnitDropdown(val);
                 renderQuickChips(val);
             }
         }
 
-        // Navigasi kekunci ArrowDown, ArrowUp, dan Enter untuk Auto-Complete Unit
         function handleUnitKeyDown(e) {
             if (selectedSubMenu !== 'Unit') return;
 
@@ -469,7 +785,6 @@
             const listEl = document.getElementById('unitAutocompleteList');
             const q = String(query || '').trim().toUpperCase();
 
-            // Utamakan unit yang bermula dengan huruf yang ditaip
             currentFilteredUnits = IKN_UNITS.filter(u => u.toUpperCase().includes(q)).sort((a, b) => {
                 const aStarts = a.toUpperCase().startsWith(q);
                 const bStarts = b.toUpperCase().startsWith(q);
@@ -487,7 +802,6 @@
 
                 listEl.innerHTML = currentFilteredUnits.map((unit, idx) => {
                     const isActive = (idx === activeAutocompleteIndex);
-                    // Serlahkan huruf yang sepadan
                     let highlightedText = unit;
                     if (q.length > 0) {
                         const matchIdx = unit.toUpperCase().indexOf(q);
@@ -586,11 +900,17 @@
                 badge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700";
                 dupBanner.classList.remove('hidden');
 
-                document.getElementById('inputName').value = existingRecord.name || 'Oxygen';
-                document.getElementById('inputType').value = existingRecord.type || 'Oxygen (F-Size)';
-                document.getElementById('inputCapacity').value = existingRecord.capacity || '1360L';
-                document.getElementById('inputExpiry').value = existingRecord.expiry || '';
-                document.getElementById('inputOwnership').value = existingRecord.ownership || 'IKN-Owned (Milik IKN)';
+                // Normalisasi jenis lama seperti "Oxygen" kepada "Oksigen" jika perlu
+                let mappedType = existingRecord.type || 'Oksigen';
+                if (mappedType.toLowerCase().includes('oxygen')) mappedType = 'Oksigen';
+                else if (mappedType.toLowerCase().includes('carbon')) mappedType = 'Karbon Dioksida';
+                else if (mappedType.toLowerCase().includes('nitrous')) mappedType = 'Nitrous Oksida';
+
+                document.getElementById('inputName').value = existingRecord.name || mappedType;
+                setSelectValueSafely('inputType', mappedType, 'Oksigen');
+                document.getElementById('inputCapacity').value = existingRecord.capacity ? String(existingRecord.capacity).replace(/kg/gi, '').trim() : '6';
+                document.getElementById('inputExpiry').value = existingRecord.expiry ? String(existingRecord.expiry).split('T')[0] : '';
+                setSelectValueSafely('inputOwnership', existingRecord.ownership, 'IKN-Owned (Milik IKN)');
 
                 toggleFormLock(true);
             } else {
@@ -598,17 +918,18 @@
                 badge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700";
                 dupBanner.classList.add('hidden');
 
-                document.getElementById('inputName').value = 'Oxygen';
-                document.getElementById('inputType').value = 'Oxygen (F-Size)';
-                document.getElementById('inputCapacity').value = '1360L';
+                document.getElementById('inputName').value = 'Oksigen';
+                setSelectValueSafely('inputType', 'Oksigen', 'Oksigen');
+                document.getElementById('inputCapacity').value = '6';
                 const defaultExp = new Date();
                 defaultExp.setFullYear(defaultExp.getFullYear() + 3);
                 document.getElementById('inputExpiry').value = defaultExp.toISOString().split('T')[0];
-                document.getElementById('inputOwnership').value = 'IKN-Owned (Milik IKN)';
+                setSelectValueSafely('inputOwnership', 'IKN-Owned (Milik IKN)', 'IKN-Owned (Milik IKN)');
 
                 toggleFormLock(false);
             }
 
+            hideCapacityDropdown();
             clearUnitInput();
             selectMainMenu('Terima');
             document.getElementById('scanModal').classList.remove('hidden');
@@ -634,6 +955,7 @@
 
         function closeScanModal() {
             hideUnitDropdown();
+            hideCapacityDropdown();
             document.getElementById('scanModal').classList.add('hidden');
         }
 
@@ -703,25 +1025,31 @@
         function submitTransaction() {
             let unitVal = document.getElementById('inputUnitDetail').value.trim().toUpperCase();
 
-            // Jika sub-menu ialah Unit, pastikan pengguna memilih atau mengisi nama unit
             if (selectedSubMenu === 'Unit') {
                 if (!unitVal) {
                     alert("Sila pilih atau taip nama Unit IKN terlebih dahulu.");
                     document.getElementById('inputUnitDetail').focus();
                     return;
                 }
-                // Jika pengguna menaip separuh (cth: "PETCT(F") dan terdapat 1 padanan tepat dalam auto-complete, lengkapkan secara automatik
                 if (!IKN_UNITS.includes(unitVal) && currentFilteredUnits.length === 1) {
                     unitVal = currentFilteredUnits[0];
                     document.getElementById('inputUnitDetail').value = unitVal;
                 }
             }
 
-            const record = {
+            const nameVal = document.getElementById('inputName').value.trim();
+            const capVal = document.getElementById('inputCapacity').value.trim();
+
+            if (!nameVal || !capVal) {
+                alert("Sila lengkapkan Nama Silinder dan Kapasiti (kg).");
+                return;
+            }
+
+            const payloadForServer = {
                 barcode: activeBarcode,
-                name: document.getElementById('inputName').value.trim(),
+                name: nameVal,
                 type: document.getElementById('inputType').value,
-                capacity: document.getElementById('inputCapacity').value.trim(),
+                capacity: capVal,
                 expiry: document.getElementById('inputExpiry').value,
                 ownership: document.getElementById('inputOwnership').value,
                 action: selectedAction,
@@ -730,20 +1058,18 @@
                 updatedAt: new Date().toLocaleString('ms-MY')
             };
 
-            if (!record.name || !record.capacity) {
-                alert("Sila lengkapkan Nama Gas dan Kapasiti silinder.");
-                return;
-            }
+            const formattedSubCategory = unitVal ? `${selectedSubMenu} (${unitVal})` : selectedSubMenu;
+            const localDisplayRecord = {
+                ...payloadForServer,
+                subCategory: formattedSubCategory
+            };
 
-            const displaySub = record.unitDetail ? `${record.subCategory} (${record.unitDetail})` : record.subCategory;
-            const localRecord = { ...record, subCategory: displaySub };
-
-            // Kemaskini dalam memori tempatan (1 rekod unik sahaja)
+            // Kemaskini dalam memori tempatan (Pastikan hanya 1 rekod unik bagi setiap kod silinder)
             const idx = cylindersDb.findIndex(c => String(c.barcode).toUpperCase() === activeBarcode);
             if (idx > -1) {
-                cylindersDb[idx] = localRecord;
+                cylindersDb[idx] = localDisplayRecord;
             } else {
-                cylindersDb.unshift(localRecord);
+                cylindersDb.unshift(localDisplayRecord);
             }
             localStorage.setItem('ikn_cylinders_cache', JSON.stringify(cylindersDb));
             renderCylinderTable();
@@ -765,12 +1091,13 @@
                         console.error(err);
                         setSyncBadge("Ralat Sync", "bg-rose-200 text-rose-900");
                     })
-                    .saveCylinderTransaction(record);
+                    .saveCylinderTransaction(payloadForServer);
             }
         }
 
         function setSyncBadge(text, cls) {
             const b = document.getElementById('recordBadge');
+            if (!b) return;
             b.innerText = text;
             b.className = `px-2 py-0.5 rounded-full font-bold text-[11px] ${cls}`;
         }
@@ -782,10 +1109,10 @@
                 return;
             }
             const icon = document.getElementById('syncIcon');
-            icon.classList.add('fa-spin');
+            if (icon) icon.classList.add('fa-spin');
             google.script.run
                 .withSuccessHandler(data => {
-                    icon.classList.remove('fa-spin');
+                    if (icon) icon.classList.remove('fa-spin');
                     if (Array.isArray(data)) {
                         cylindersDb = data;
                         localStorage.setItem('ikn_cylinders_cache', JSON.stringify(cylindersDb));
@@ -793,24 +1120,34 @@
                     }
                 })
                 .withFailureHandler(err => {
-                    icon.classList.remove('fa-spin');
+                    if (icon) icon.classList.remove('fa-spin');
                     console.error("Gagal memuat turun:", err);
                 })
                 .getAllCylinders();
         }
 
-        // 8. Paparkan Jadual Silinder
+        // 8. Paparkan Jadual Silinder & Kemas Kini Papan Pemuka
         function renderCylinderTable() {
+            updateDashboardSummary();
+
             const tbody = document.getElementById('tableBody');
             const filter = (document.getElementById('searchFilter').value || '').toLowerCase();
             
-            const filtered = cylindersDb.filter(c => 
-                c.barcode.toLowerCase().includes(filter) ||
-                c.name.toLowerCase().includes(filter) ||
-                (c.subCategory && c.subCategory.toLowerCase().includes(filter))
-            );
+            const filtered = cylindersDb.filter(c => {
+                const ownStr = String(c.ownership || '').toUpperCase();
+                const isOwned = ownStr.includes('IKN') || ownStr.includes('OWNED') || ownStr.includes('MILIK');
+                
+                if (currentDashboardFilter === 'OWNED' && !isOwned) return false;
+                if (currentDashboardFilter === 'LOANED' && isOwned) return false;
+                if (currentDashboardFilter === 'EXPIRING' && !isExpiringWithin30Days(c.expiry)) return false;
 
-            document.getElementById('countCylinders').innerText = cylindersDb.length;
+                return String(c.barcode || '').toLowerCase().includes(filter) ||
+                       String(c.name || '').toLowerCase().includes(filter) ||
+                       String(c.type || '').toLowerCase().includes(filter) ||
+                       String(c.subCategory || '').toLowerCase().includes(filter);
+            });
+
+            document.getElementById('countCylinders').innerText = filtered.length;
 
             if (filtered.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-5 text-center text-slate-400">Tiada rekod silinder ditemui.</td></tr>`;
@@ -818,18 +1155,34 @@
             }
 
             tbody.innerHTML = filtered.map(c => {
-                const isOwned = String(c.ownership).includes('IKN');
+                const ownStr = String(c.ownership || '').toUpperCase();
+                const isOwned = ownStr.includes('IKN') || ownStr.includes('OWNED') || ownStr.includes('MILIK');
                 const isTerima = c.action === 'Terima';
+                const safeBarcode = String(c.barcode || '').replace(/'/g, "\\'");
+                
+                const daysLeft = getDaysUntilExpiry(c.expiry);
+                const isExpiring = daysLeft !== null && daysLeft < 30;
+                const cleanExpiry = c.expiry ? String(c.expiry).split('T')[0] : '-';
+
+                let expiryBadgeHtml = `<div class="text-[10px] text-slate-400">Luput: ${cleanExpiry}</div>`;
+                if (isExpiring) {
+                    const statusLabel = daysLeft < 0 ? `Tamat (${Math.abs(daysLeft)}h)` : `Luput: ${cleanExpiry} (${daysLeft}h)`;
+                    expiryBadgeHtml = `<div class="text-[10px] font-bold text-rose-600 flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation"></i> ${statusLabel}</div>`;
+                }
+
+                const rawCap = String(c.capacity || '-').trim();
+                const displayCap = rawCap.toLowerCase().endsWith('kg') || rawCap === '-' ? rawCap : `${rawCap} kg`;
+
                 return `
-                <tr class="hover:bg-slate-50 cursor-pointer transition" onclick="handleScanTrigger('${c.barcode}')">
+                <tr class="hover:bg-slate-50 cursor-pointer transition ${isExpiring ? 'bg-rose-50/30' : ''}" onclick="handleScanTrigger('${safeBarcode}')">
                     <td class="p-2.5 font-mono font-bold text-slate-800">${c.barcode}</td>
                     <td class="p-2.5">
                         <div class="font-semibold text-slate-800">${c.name}</div>
                         <div class="text-[10px] text-slate-500">${c.type}</div>
                     </td>
                     <td class="p-2.5">
-                        <div class="text-slate-700 font-medium">${c.capacity}</div>
-                        <div class="text-[10px] text-slate-400">Luput: ${c.expiry || '-'}</div>
+                        <div class="text-slate-700 font-medium">${displayCap}</div>
+                        ${expiryBadgeHtml}
                     </td>
                     <td class="p-2.5">
                         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isOwned ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
@@ -838,7 +1191,7 @@
                     </td>
                     <td class="p-2.5">
                         <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isTerima ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">
-                            ${c.action}: ${c.subCategory}
+                            ${c.action || 'Terima'}: ${c.subCategory || '-'}
                         </span>
                     </td>
                 </tr>`;
@@ -846,7 +1199,7 @@
         }
 
         // 9. Kawalan Tab Mod Input (Papan Kekunci / Kamera / NFC)
-        function switchMode(mode) {
+        async function switchMode(mode) {
             document.getElementById('panelKeyboard').classList.add('hidden');
             document.getElementById('panelCamera').classList.add('hidden');
             document.getElementById('panelNfc').classList.add('hidden');
@@ -855,7 +1208,9 @@
                 document.getElementById(id).className = "py-2.5 px-2 text-xs font-semibold rounded-xl border border-slate-200 bg-white text-slate-600 transition flex flex-col items-center gap-1";
             });
 
-            if (mode !== 'camera') stopCamera();
+            if (mode !== 'camera') {
+                await stopCamera();
+            }
 
             if (mode === 'keyboard') {
                 document.getElementById('panelKeyboard').classList.remove('hidden');
@@ -864,7 +1219,7 @@
             } else if (mode === 'camera') {
                 document.getElementById('panelCamera').classList.remove('hidden');
                 document.getElementById('tabCam').className = "py-2.5 px-2 text-xs font-semibold rounded-xl border border-emerald-600 bg-emerald-50 text-emerald-700 transition flex flex-col items-center gap-1";
-                startCamera();
+                await startCamera();
             } else if (mode === 'nfc') {
                 document.getElementById('panelNfc').classList.remove('hidden');
                 document.getElementById('tabNfc').className = "py-2.5 px-2 text-xs font-semibold rounded-xl border border-emerald-600 bg-emerald-50 text-emerald-700 transition flex flex-col items-center gap-1";
@@ -877,25 +1232,50 @@
         }
 
         // 10. Fungsi Kamera QR/Barcode
-        function startCamera() {
-            if (!html5QrScanner) {
-                html5QrScanner = new Html5Qrcode("qrReader");
-            }
-            html5QrScanner.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: { width: 240, height: 140 } },
-                (decodedText) => {
-                    handleScanTrigger(decodedText);
-                },
-                () => {}
-            ).catch(err => {
+        async function startCamera() {
+            const errEl = document.getElementById('cameraErrorMsg');
+            if (errEl) errEl.classList.add('hidden');
+
+            if (isCameraTransitioning) return;
+            isCameraTransitioning = true;
+
+            try {
+                if (!html5QrScanner) {
+                    html5QrScanner = new Html5Qrcode("qrReader");
+                }
+                if (html5QrScanner.isScanning) {
+                    await html5QrScanner.stop();
+                }
+                await html5QrScanner.start(
+                    { facingMode: "environment" },
+                    { fps: 10, qrbox: { width: 240, height: 140 } },
+                    (decodedText) => {
+                        handleScanTrigger(decodedText);
+                    },
+                    () => {}
+                );
+            } catch (err) {
                 console.warn("Kamera tidak dapat diakses:", err);
-            });
+                if (errEl) {
+                    errEl.innerText = "Kamera tidak dapat diakses. Sila benarkan akses kamera pada pelayar anda.";
+                    errEl.classList.remove('hidden');
+                }
+            } finally {
+                isCameraTransitioning = false;
+            }
         }
 
-        function stopCamera() {
-            if (html5QrScanner && html5QrScanner.isScanning) {
-                html5QrScanner.stop().catch(() => {});
+        async function stopCamera() {
+            if (isCameraTransitioning || !html5QrScanner) return;
+            try {
+                if (html5QrScanner.isScanning) {
+                    isCameraTransitioning = true;
+                    await html5QrScanner.stop();
+                }
+            } catch (e) {
+                console.warn("Ralat menutup kamera:", e);
+            } finally {
+                isCameraTransitioning = false;
             }
         }
 
@@ -920,8 +1300,10 @@
                 
                 document.getElementById('nfcTitle').innerText = "Sedia Mengimbas Tag NFC...";
                 document.getElementById('nfcDesc').innerText = "Sila sentuh belakang telefon anda pada tag NFC silinder sekarang.";
-                document.getElementById('btnStartNfc').innerText = "Menunggu Sentuhan Tag...";
-                document.getElementById('btnStartNfc').classList.replace('bg-emerald-600', 'bg-amber-600');
+                const btn = document.getElementById('btnStartNfc');
+                btn.innerText = "Menunggu Sentuhan Tag...";
+                btn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+                btn.classList.add('bg-amber-600', 'hover:bg-amber-700');
 
                 ndef.onreading = event => {
                     let tagId = event.serialNumber ? event.serialNumber.replace(/:/g, '').toUpperCase() : '';
@@ -955,11 +1337,11 @@
         }
 
         // Mulakan aplikasi
-        window.onload = () => {
+        window.addEventListener('DOMContentLoaded', () => {
             initUnitAutocomplete();
             renderCylinderTable();
             loadFromGoogleSheets();
-        };
+        });
     </script>
 </body>
 </html>
